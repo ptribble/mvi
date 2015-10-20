@@ -1,0 +1,2 @@
+#!/sbin/sh
+/usr/versions/node-v4/bin/node /mvios.js > /dev/console < /dev/null 2>&1 &

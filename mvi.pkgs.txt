@@ -1,0 +1,39 @@
+Drivers: pcn, e1000g, vioif are what you see in VMs
+
+TRIBsys-kernel-platform
+
+TRIBdrv-i86pc-platform - has useful things like cmdk, asy
+
+TRIBsys-zones - contains libraries that might be needed by common
+utilities
+
+TRIBsys-boot-grub - needed as part of the ISO construction and boot
+
+consconfig_dacf needs usbser, so can't remove TRIBdrv-ser-usbser
+
+If you don't install zfs, the system will panic if you do a 'find /'
+(I think once it walks into /dev)
+
+TRIBsys-boot-real-mode - system panics if it's not present
+
+
+virtualbox - network is e1000g, storage is ahci
+
+qemu - network is e1000g, storage is cmdk
+
+vmware - network is e1000g, storage is mpt
+
+mpt is in TRIBsys-kernel
+cmdk is in TRIBdrv-i86pc-platform
+ahci is in TRIBdrv-storage-ahci
+
+So don't need pcn at all
+
+
+Standard build at this point is a 192M (148M used) image that creates a 72M iso
+
+64bit is 144M (122M used) for a 56M iso
+
+32bit is 96M (79M used) image for a 39M iso
+
+Unfortunately, strip doesn't work, in general
