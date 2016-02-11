@@ -9,17 +9,32 @@
 ISO_NAME=/var/tmp/mvi.iso
 
 #
+# Tribblix version for illumos pkgs
+#
+DISTVER=16
+ILVER=0.${DISTVER}
+
+#
 # *** CUSTOMIZE ***
 # where your illumos and other packages live
 #
-PROTO_DIR=/packages/localsrc/Tribblix/illumos-pkgs-m16
-PKG_DIR=/packages/localsrc/Tribblix
+THOME=/packages/localsrc/Tribblix
+PROTO_DIR=${THOME}/illumos-pkgs-m${DISTVER}
+PKG_DIR=${THOME}
+INSTZAP=/usr/lib/zap/instzap
+if [ ! -x ${INSTZAP} ]; then
+    INSTZAP=${THOME}/zap/usr/lib/zap/instzap
+fi
+if [ ! -x ${INSTZAP} ]; then
+    echo "ERROR: unable to find instzap"
+    exit 1
+fi
 
 #
 # *** CUSTOMIZE ***
 # where your mvi configuration lives
 #
-MVI_DIR=/packages/localsrc/Tribblix/mvi
+MVI_DIR=${THOME}/mvi
 
 #
 # this is the size of the ramdisk we create and should match the size
@@ -61,10 +76,10 @@ fi
 mkdir -p ${DESTDIR}
 for pkg in `cat ${MVI_DIR}/mvi.pkgs`
 do
-    if [ -f ${PROTO_DIR}/pkgs/${pkg}.0.16.0.pkg ]; then
-	pkgadd -a /usr/lib/zap/pkg.force -d ${PROTO_DIR}/pkgs/${pkg}.0.16.0.pkg -R $DESTDIR all
+    if [ -f ${PROTO_DIR}/pkgs/${pkg}.${ILVER}.0.zap ]; then
+	$INSTZAP -R $DESTDIR ${PROTO_DIR}/pkgs/${pkg}.${ILVER}.0.zap `echo $pkg | awk -F. '{print $1}'`
     else
-	pkgadd -a /usr/lib/zap/pkg.force -d ${PKG_DIR}/pkgs/${pkg}.pkg -R $DESTDIR all
+	$INSTZAP -R $DESTDIR ${PKG_DIR}/pkgs/${pkg}.zap `echo $pkg | awk -F. '{print $1}'`
     fi
 done
 #
@@ -75,10 +90,10 @@ do
     if [ -f ${MVI_DIR}/${xopt}.pkgs ]; then
 	for pkg in `cat ${MVI_DIR}/${xopt}.pkgs`
 	do
-	    if [ -f ${PROTO_DIR}/pkgs/${pkg}.0.16.0.pkg ]; then
-		pkgadd -a /usr/lib/zap/pkg.force -d ${PROTO_DIR}/pkgs/${pkg}.0.16.0.pkg -R $DESTDIR all
+	    if [ -f ${PROTO_DIR}/pkgs/${pkg}.${ILVER}.0.zap ]; then
+		$INSTZAP -R $DESTDIR ${PROTO_DIR}/pkgs/${pkg}.${ILVER}.0.zap `echo $pkg | awk -F. '{print $1}'`
 	    else
-		pkgadd -a /usr/lib/zap/pkg.force -d ${PKG_DIR}/pkgs/${pkg}.pkg -R $DESTDIR all
+		$INSTZAP -R $DESTDIR ${PKG_DIR}/pkgs/${pkg}.zap `echo $pkg | awk -F. '{print $1}'`
 	    fi
 	done
     fi
