@@ -19,6 +19,7 @@ ILVER=0.${DISTVER}
 # where your illumos and other packages live
 #
 THOME=/packages/localsrc/Tribblix
+export THOME
 PROTO_DIR=${THOME}/illumos-pkgs-m${DISTVER}
 PKG_DIR=${THOME}
 INSTZAP=/usr/lib/zap/instzap
@@ -35,6 +36,38 @@ fi
 # where your mvi configuration lives
 #
 MVI_DIR=${THOME}/mvi
+
+#
+# argument processing
+#
+INSTALL_PKGS=${MVI_DIR}/install-from-local.sh
+while getopts "frsv:" opt; do
+    case $opt in
+	f)
+	    # install from file system
+	    INSTALL_PKGS=${MVI_DIR}/install-from-local.sh
+	    if [ ! -d $PROTO_DIR ]; then
+		echo "ERROR: unable to find packages area $PROTO_DIR"
+		exit 1
+	    fi
+	    ;;
+	r)
+	    # install from repo
+	    INSTALL_PKGS=${MVI_DIR}/install-from-repo.sh
+	    echo "WARNING: not yet supported"
+	    exit 2
+	    ;;
+	s)
+	    # install via system (direct zap)
+	    INSTALL_PKGS=${MVI_DIR}/install-with-zap.sh
+	    ;;
+	v)
+	    # tribblix version
+	    DISTVER="$OPTARG"
+	    ;;
+    esac
+done
+shift $((OPTIND-1))
 
 #
 # this is the size of the ramdisk we create and should match the size
@@ -62,40 +95,27 @@ fi
 #
 # check we have input to deal with
 #
-if [ ! -d $PROTO_DIR ]; then
-    echo "ERROR: unable to find packages area $PROTO_DIR"
-    exit 1
-fi
 if [ ! -d $MVI_DIR ]; then
     echo "ERROR: unable to find mvi area $MVI_DIR"
     exit 1
 fi
+if [ ! -x ${INSTALL_PKGS} ]; then
+    echo "ERROR: unable to find install script ${INSTALL_PKGS}"
+    exit 1
+fi
+
 #
 # clean up and populate
 #
-mkdir -p ${DESTDIR}
-for pkg in `cat ${MVI_DIR}/mvi.pkgs`
-do
-    if [ -f ${PROTO_DIR}/pkgs/${pkg}.${ILVER}.0.zap ]; then
-	$INSTZAP -R $DESTDIR ${PROTO_DIR}/pkgs/${pkg}.${ILVER}.0.zap `echo $pkg | awk -F. '{print $1}'`
-    else
-	$INSTZAP -R $DESTDIR ${PKG_DIR}/pkgs/${pkg}.zap `echo $pkg | awk -F. '{print $1}'`
-    fi
-done
+${INSTALL_PKGS} ${DISTVER} ${DESTDIR} ${MVI_DIR}/mvi.pkgs
+
 #
 # these are options
 #
 for xopt in $*
 do
     if [ -f ${MVI_DIR}/${xopt}.pkgs ]; then
-	for pkg in `cat ${MVI_DIR}/${xopt}.pkgs`
-	do
-	    if [ -f ${PROTO_DIR}/pkgs/${pkg}.${ILVER}.0.zap ]; then
-		$INSTZAP -R $DESTDIR ${PROTO_DIR}/pkgs/${pkg}.${ILVER}.0.zap `echo $pkg | awk -F. '{print $1}'`
-	    else
-		$INSTZAP -R $DESTDIR ${PKG_DIR}/pkgs/${pkg}.zap `echo $pkg | awk -F. '{print $1}'`
-	    fi
-	done
+	${INSTALL_PKGS} ${DISTVER} ${DESTDIR} ${MVI_DIR}/${xopt}.pkgs
     fi
 done
 
