@@ -34,7 +34,7 @@ tested qemu and VirtualBox.
 
 As an example:
 
-./mvix.sh 64-bit node vboxnet
+./mvix.sh 64bit node vboxnet
 
 will create a minimal (25M) iso suitable for booting under VirtualBox,
 running a simple node webserver on http://192.168.59.59:8000
