@@ -13,8 +13,17 @@ http.createServer(function (request, response) {
 EOF
 
 #
+# we don't need all of this
+#
+rm -fr usr/versions/node-v4/include
+rm -fr usr/versions/node-v4/share
+# assume a 32-bit node binary
+rm -f usr/lib/amd64/libgcc_s.*
+rm -f usr/lib/amd64/libstdc++.so*
+
+#
 # modify MRSIZE
 #
 TSIZE=`echo $MRSIZE | sed s:M::`
-TSIZE=$(($TSIZE+20))
+TSIZE=$(($TSIZE+32))
 MRSIZE=${TSIZE}M

@@ -18,8 +18,9 @@ do
     done
 done
 #
-# mvi.sh would be sane at 144M
+# in general, a 64-bit build is about two thirds the base size
 # mvix.sh can go below 48M
 #
-MRSIZE=48M
-#MRSIZE=144M
+TSIZE=`echo $MRSIZE | sed s:M::`
+TSIZE=$((2*$TSIZE/3))
+MRSIZE=${TSIZE}M

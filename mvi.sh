@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/ksh
 #
 # create a minimal viable illumos bootable image
 #
@@ -73,7 +73,7 @@ shift $((OPTIND-1))
 # this is the size of the ramdisk we create and should match the size
 # of the packaged install
 #
-MRSIZE=192M
+MRSIZE=160M
 NBPI=16384
 
 #
@@ -395,6 +395,7 @@ rm -fr dev devices etc export home kernel lib licenses mnt opt proc root sbin sy
 	-no-emul-boot -boot-load-size 4 -boot-info-table -N -l -R -U \
         -allow-multidot -no-iso-translate -cache-inodes -d -D \
 	-V "illumos" ${DESTDIR}
+sync
 ls -lsh $ISO_NAME
 
 #
