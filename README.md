@@ -12,7 +12,14 @@ to the minimization problem. With mvi.sh, everything is installed, and
 then unnecessary files removed; with mvix.sh you have to explicitly list
 the userland files that should be present.
 
-The scripts take arguments, some examples are:
+Arguments to the scripts are:
+ -f        install from file system
+ -r	   install from repo (not yet implemented)
+ -s	   install using system zap
+ -p name   use name.pkgs as the list of packages, default mvi
+ -v ver	   use packages from Tribblix version given
+
+The scripts take option arguments, some examples are:
 
  - 32bit means create a 32-bit kernel image, with 32-bit userland
  - 64bit means to remove 32-bit kernel components

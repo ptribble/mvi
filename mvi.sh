@@ -40,8 +40,9 @@ MVI_DIR=${THOME}/mvi
 #
 # argument processing
 #
+PKG_LIST="mvi"
 INSTALL_PKGS=${MVI_DIR}/install-from-local.sh
-while getopts "frsv:" opt; do
+while getopts "frsp:v:" opt; do
     case $opt in
 	f)
 	    # install from file system
@@ -60,6 +61,10 @@ while getopts "frsv:" opt; do
 	s)
 	    # install via system (direct zap)
 	    INSTALL_PKGS=${MVI_DIR}/install-with-zap.sh
+	    ;;
+	p)
+	    # name of file containing pkg list
+	    PKG_LIST="$OPTARG"
 	    ;;
 	v)
 	    # tribblix version
@@ -103,11 +108,15 @@ if [ ! -x ${INSTALL_PKGS} ]; then
     echo "ERROR: unable to find install script ${INSTALL_PKGS}"
     exit 1
 fi
+if [ ! -f ${MVI_DIR}/${PKG_LIST}.pkgs ]; then
+    echo "ERROR: unable to find package list ${MVI_DIR}/${PKG_LIST}.pkgs"
+    exit 1
+fi
 
 #
 # clean up and populate
 #
-${INSTALL_PKGS} ${DISTVER} ${DESTDIR} ${MVI_DIR}/mvi.pkgs
+${INSTALL_PKGS} ${DISTVER} ${DESTDIR} ${MVI_DIR}/${PKG_LIST}.pkgs
 
 #
 # these are options
