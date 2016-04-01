@@ -1,0 +1,20 @@
+#!/sbin/sh
+#
+# this configures dhcp on e1000g0
+#
+# dhcpagent binds to localhost:4999 which requires lo0
+# the auto-revarp appears to be necessary
+#
+IFNAME="e1000g0"
+
+env SMF_FMRI=svc/net/ip:d /lib/inet/ipmgmtd
+env SMF_FMRI=svc/net/dl:d /sbin/dlmgmtd
+/sbin/dladm init-secobj
+/sbin/dladm init-phys
+/sbin/ifconfig lo0 plumb 127.0.0.1 up
+/sbin/ifconfig lo0 inet6 plumb ::1 up
+/lib/inet/netcfgd
+/sbin/ifconfig -adD4 auto-revarp netmask + broadcast + up
+/sbin/ifconfig $IFNAME plumb
+/sbin/ifconfig $IFNAME auto-dhcp primary
+/sbin/ifconfig $IFNAME
