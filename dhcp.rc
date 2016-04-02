@@ -13,7 +13,6 @@ env SMF_FMRI=svc/net/dl:d /sbin/dlmgmtd
 /sbin/dladm init-phys
 /sbin/ifconfig lo0 plumb 127.0.0.1 up
 /sbin/ifconfig lo0 inet6 plumb ::1 up
-/lib/inet/netcfgd
 /sbin/ifconfig -adD4 auto-revarp netmask + broadcast + up
 /sbin/ifconfig $IFNAME plumb
 /sbin/ifconfig $IFNAME auto-dhcp primary
