@@ -277,7 +277,7 @@ mkfile ${MRSIZE} /tmp/${MRSIZE}
 chmod o-t /tmp/${MRSIZE}
 LOFIDEV=`lofiadm -a /tmp/${MRSIZE}`
 LOFINUM=`echo $LOFIDEV|awk -F/ '{print $NF}'`
-echo "y" | newfs -o space -m 0 -i $NBPI /dev/rlofi/$LOFINUM
+echo "y" | env NOINUSE_CHECK=1 newfs -o space -m 0 -i $NBPI /dev/rlofi/$LOFINUM
 BFS=/tmp/nb.$$
 mkdir $BFS
 mount -Fufs -o nologging $LOFIDEV $BFS
