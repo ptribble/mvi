@@ -174,9 +174,9 @@ rm -fr var/saf
 rmdir var/cores
 rmdir var/idmap
 rmdir var/inet
-rmdir var/adm/*
 rm var/adm/spellhist
 rm var/adm/aculog
+rmdir var/adm/*
 #
 rm boot/grub/reiser*
 rm boot/grub/zfs*
@@ -184,7 +184,6 @@ rm boot/grub/jfs*
 rm boot/grub/xfs*
 rm boot/grub/e2fs*
 rm boot/grub/minix*
-rm boot/grub/splash.xpm.gz
 rm boot/grub/vstafs*
 rm boot/grub/fat*
 rm boot/grub/ffs*

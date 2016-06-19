@@ -253,11 +253,6 @@ rm -f usr/bin/svcs
 rm -f usr/sbin/svcadm
 rm -f usr/bin/svcprop
 rm -fr lib/svc/bin
-#
-# we don't need the splash images
-#
-rm -f boot/solaris.xpm
-rm -f boot/splashimage.xpm
 
 #
 # run any requested cleanup scripts
@@ -318,9 +313,6 @@ kernel\$ /platform/i86pc/kernel/\$ISADIR/unix
 module\$ /platform/i86pc/boot_archive
 title minimal viable illumos (ttya)
 kernel\$ /platform/i86pc/kernel/\$ISADIR/unix -B console=ttya,input-device=ttya,output-device=ttya
-module\$ /platform/i86pc/boot_archive
-title minimal viable illumos debug
-kernel\$ /platform/i86pc/kernel/\$ISADIR/unix -kv -d
 module\$ /platform/i86pc/boot_archive
 title Boot from hard disk
 rootnoverify (hd0)

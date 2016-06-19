@@ -104,6 +104,7 @@ rm -f etc/netmasks etc/inet/netmasks
 rm -f etc/networks etc/inet/networks
 rm -f etc/protocols etc/inet/protocols
 rm -f etc/inet/ipaddrsel.conf
+rm -fr etc/rcm
 rm etc/rpc
 rm etc/ftpusers
 rm etc/cfgadm

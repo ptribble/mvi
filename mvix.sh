@@ -182,8 +182,6 @@ rm -fr etc/rc?.d etc/init.d etc/cron.d etc/opt
 rm -f etc/rc?
 rm -fr etc/fs/hsfs etc/inet/ike etc/inet/secret
 rm -fr platform/i86xpv
-rm -f boot/solaris.xpm
-rm -f boot/splashimage.xpm
 rm -fr boot/grub/pxegrub boot/grub/nbgrub
 rm -fr kernel/kiconv
 #
@@ -245,9 +243,6 @@ kernel\$ /platform/i86pc/kernel/\$ISADIR/unix
 module\$ /platform/i86pc/boot_archive
 title minimal viable illumos (ttya)
 kernel\$ /platform/i86pc/kernel/\$ISADIR/unix -B console=ttya,input-device=ttya,output-device=ttya
-module\$ /platform/i86pc/boot_archive
-title minimal viable illumos debug
-kernel\$ /platform/i86pc/kernel/\$ISADIR/unix -kv -d
 module\$ /platform/i86pc/boot_archive
 title Boot from hard disk
 rootnoverify (hd0)
