@@ -1,0 +1,3 @@
+#!/sbin/sh
+/usr/sbin/devfsadm
+echo "Recommended usage: ./wipe.sh -B -A"

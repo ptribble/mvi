@@ -35,9 +35,9 @@ For any argument foo, there may be some files:
  - foo.files will copy files into the image (for mvix.sh)
  - foo-fix.sh will be run
 
-The intention here is that the system will be booted under a hypervisor,
-allowing most of the drivers and support files to be eliminated. I have
-tested qemu and VirtualBox.
+The intention here is that the system will often be booted under a hypervisor,
+allowing most of the drivers and support files to be eliminated by default. I
+have tested qemu and VirtualBox.
 
 As an example:
 
@@ -48,3 +48,11 @@ running a simple node webserver on http://192.168.59.59:8000
 
 (For this to work you'll need to set up the VM network to be a Host-only
 Adapter and make sure it's on the appropriate subnet.)
+
+Another example:
+
+./mvix.sh 64bit wipe
+
+will create a 15M iso suitable for wiping disk drives (it's using
+format/analyze/purge underneath, nothing complicated). This includes
+most of the common storage drivers, so will boot on real hardware.
