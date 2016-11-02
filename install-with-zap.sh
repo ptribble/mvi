@@ -16,7 +16,7 @@ case $# in
 	;;
 esac
 
-INSTZAP=/usr/lib/zap/zap
+INSTZAP=/usr/lib/zap/install-pkg
 if [ ! -x ${INSTZAP} ]; then
     echo "ERROR: unable to find zap"
     exit 1
