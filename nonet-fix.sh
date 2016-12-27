@@ -52,7 +52,6 @@ rm -f lib/libdevinfo.so.1
 rm -f lib/libdlpi.so.1
 rm -f lib/libgen.so.1
 rm -f lib/libipadm.so.1
-rm -f lib/libumem.so.1
 rm -f lib/libxnet.so.1
 rm -f etc/default/inetinit
 rm -f etc/default/ipsec
