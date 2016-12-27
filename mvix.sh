@@ -221,7 +221,7 @@ EOF
 done
 cat >> ${DESTDIR}/etc/mvi.rc <<EOF
 echo " *** Welcome to minimal viable illumos ***" > /dev/console
-/bin/i86/ksh93 >/dev/console 2>&1 </dev/console
+/bin/sh >/dev/console 2>&1 </dev/console
 EOF
 chmod a+x ${DESTDIR}/etc/mvi.rc
 #
