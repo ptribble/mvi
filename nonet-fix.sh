@@ -46,6 +46,7 @@ rm -f kernel/misc/neti
 rm usr/sbin/ifconfig
 rmdir usr/sbin
 rm -f sbin/ifconfig
+rm -fr var/inet
 rm -fr lib/inet
 rm -f lib/libdladm.so.1
 rm -f lib/libdevinfo.so.1

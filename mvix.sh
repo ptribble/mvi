@@ -140,11 +140,11 @@ mkdir usr sbin lib lib/inet usr/lib usr/sbin usr/bin usr/bin/i86 usr/bin/amd64
 #
 # need init and sh
 #
-for file in `cat ${MVI_DIR}/mvi.dirs`
+for file in `grep -v '^#' ${MVI_DIR}/mvi.dirs`
 do
   mkdir -p $file
 done
-for file in `cat ${MVI_DIR}/mvi.files`
+for file in `grep -v '^#' ${MVI_DIR}/mvi.files`
 do
   mv stage/$file $file
 done
@@ -154,13 +154,13 @@ done
 for xopt in $*
 do
     if [ -f ${MVI_DIR}/${xopt}.dirs ]; then
-	for file in `cat ${MVI_DIR}/${xopt}.dirs`
+	for file in `grep -v '^#' ${MVI_DIR}/${xopt}.dirs`
 	do
 	    mkdir -p $file
 	done
     fi
     if [ -f ${MVI_DIR}/${xopt}.files ]; then
-	for file in `cat ${MVI_DIR}/${xopt}.files`
+	for file in `grep -v '^#' ${MVI_DIR}/${xopt}.files`
 	do
 	    mv stage/$file $file
 	done
@@ -178,6 +178,7 @@ rm -fr etc/mail etc/nwam etc/zones etc/brand etc/skel
 rm -fr etc/svc/profile
 rm -fr etc/tm etc/saf etc/sasl etc/zfs etc/logadm.d
 rm -fr var/sadm var/svc var/mail var/spool var/preserve var/games
+rm -fr var/saf var/opt var/cron var/idmap var/logadm
 rm -fr etc/rc?.d etc/init.d etc/cron.d etc/opt
 rm -f etc/rc?
 rm -fr etc/fs/hsfs etc/inet/ike etc/inet/secret
