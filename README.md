@@ -56,3 +56,15 @@ Another example:
 will create a 15M iso suitable for wiping disk drives (it's using
 format/analyze/purge underneath, nothing complicated). This includes
 most of the common storage drivers, so will boot on real hardware.
+
+There's also a variant that can create a tarball suitable for unpacking as
+the filesystem for a zone. In this case we don't need any drivers. For example
+
+./zmvix.sh nonet node
+
+will create a 11M compressed tarball containing enough to run the same
+simple node webserver above in a zone (this assumes a shared-ip network
+stack). If you wish to get into the zone then you'll need to use zlogin
+with the -S flag. A full zlogin can be enabled with
+
+./zmvix.sh node zlogin

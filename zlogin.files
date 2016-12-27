@@ -1,0 +1,14 @@
+# zlogin (without -S) needs the following
+# note that zlogin is incompatible with nonet
+usr/bin/login
+usr/lib/security/pam_roles.so.1
+usr/lib/security/pam_unix_account.so.1
+usr/lib/security/pam_unix_session.so.1
+usr/lib/security/pam_unix_auth.so.1
+usr/lib/security/pam_unix_cred.so.1
+usr/lib/security/pam_authtok_get.so.1
+usr/lib/security/pam_dhkeys.so.1
+usr/lib/passwdutil.so.1
+lib/libdevinfo.so.1
+lib/libproc.so.1
+usr/lib/libproject.so.1
