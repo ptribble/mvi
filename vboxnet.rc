@@ -5,7 +5,7 @@
 # to access this in VirtualBox, configure host-only networking
 #
 IFNAME="e1000g0"
-IFADDR="192.168.59.59/24"
+IFADDR="192.168.56.56/24"
 
 /sbin/ifconfig $IFNAME plumb
 env SMF_FMRI=svc/net/ip:d /lib/inet/ipmgmtd

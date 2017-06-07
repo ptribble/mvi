@@ -44,7 +44,7 @@ As an example:
 ./mvix.sh 64bit node vboxnet
 
 will create a minimal (25M) iso suitable for booting under VirtualBox,
-running a simple node webserver on http://192.168.59.59:8000
+running a simple node webserver on http://192.168.56.56:8000
 
 (For this to work you'll need to set up the VM network to be a Host-only
 Adapter and make sure it's on the appropriate subnet.)
