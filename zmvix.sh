@@ -12,13 +12,12 @@ ISO_NAME=/var/tmp/zmvi.tar.gz
 # Tribblix version for illumos pkgs
 #
 DISTVER=20
-ILVER=0.${DISTVER}
 
 #
 # *** CUSTOMIZE ***
 # where your illumos and other packages live
 #
-THOME=/packages/localsrc/Tribblix
+THOME=${THOME:-/packages/localsrc/Tribblix}
 export THOME
 PROTO_DIR=${THOME}/illumos-pkgs-m${DISTVER}
 PKG_DIR=${THOME}
@@ -69,6 +68,7 @@ while getopts "frsp:v:" opt; do
 	v)
 	    # tribblix version
 	    DISTVER="$OPTARG"
+	    PROTO_DIR=${THOME}/illumos-pkgs-m${DISTVER}
 	    ;;
     esac
 done
