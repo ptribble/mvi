@@ -5,4 +5,5 @@ usr/lib/libstdc++.so.6
 usr/lib/libstdc++.so.6.0.19
 usr/lib/libgcc_s.so.1
 lib/libpthread.so.1
-usr/versions/node-v4/bin/node 
+usr/versions/node-v6/bin/node 
+usr/versions/node-v6/bin/i86/node 
