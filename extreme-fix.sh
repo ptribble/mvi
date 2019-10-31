@@ -1,38 +1,45 @@
 #!/bin/sh
 #
-# assume mvix, and that 32bit runs first
+# assume mvix
 #
-rm -f kernel/fs/zfs
-rm -f kernel/drv/zfs
+rm -f kernel/fs/*/zfs
+rm -f kernel/drv/*/zfs
 rm -f kernel/drv/zfs.conf
 rm -fr etc/fs/zfs
 gsed -i '/zfs/d' etc/minor_perm
 gsed -i '/zfs/d' etc/name_to_major
-rm kernel/misc/kmdbmod
-rm kernel/drv/bsc*
+rm kernel/misc/*/kmdbmod
+rm kernel/drv/*/bsc*
 rm -fr kernel/crypto
-rm -f kernel/misc/des
-rm -f kernel/misc/skein
-rm -f kernel/misc/sha1
-rm -f kernel/misc/sha2
-rm -f kernel/misc/edonr
-rm -f kernel/misc/md5
-rm -f kernel/misc/crypto
-rm -f kernel/drv/kssl*
-rm -f kernel/misc/kcf
+rm -f kernel/misc/*/des
+rm -f kernel/misc/*/skein
+rm -f kernel/misc/*/sha1
+rm -f kernel/misc/*/sha2
+rm -f kernel/misc/*/edonr
+rm -f kernel/misc/*/md5
+rm -f kernel/misc/*/crypto
+rm -f kernel/drv/*/kssl
+rm -f kernel/drv/kssl.conf
+rm -f kernel/misc/*/kcf
 rm -fr etc/crypto
-rm -f kernel/drv/power*
-rm -f kernel/drv/keysock*
-rm -f kernel/drv/spdsock*
-rm -f kernel/drv/kmdb*
-rm -f kernel/misc/ctf
-rm -f kernel/misc/ksocket
-rm -f kernel/sys/kaio
-rm -f kernel/misc/tlimod
-rm -f kernel/strmod/timod
-rm -f kernel/strmod/tirdwr
-rm -f kernel/drv/tl*
-rm -f kernel/drv/rts*
+rm -f kernel/drv/*/power
+rm -f kernel/drv/power.conf
+rm -f kernel/drv/*/keysock
+rm -f kernel/drv/keysock.conf
+rm -f kernel/drv/*/spdsock
+rm -f kernel/drv/spdsock.conf
+rm -f kernel/drv/*/kmdb
+rm -f kernel/drv/kmdb.conf
+rm -f kernel/misc/*/ctf
+rm -f kernel/misc/*/ksocket
+rm -f kernel/sys/*/kaio
+rm -f kernel/misc/*/tlimod
+rm -f kernel/strmod/*/timod
+rm -f kernel/strmod/*/tirdwr
+rm -f kernel/drv/*/tl
+rm -f kernel/drv/tl.conf
+rm -f kernel/drv/*/rts
+rm -f kernel/drv/rts.conf
 
 #
 # clean up even more
@@ -117,39 +124,51 @@ rmdir export
 rmdir mnt
 rmdir home
 #
-rm kernel/drv/ecpp*
-rm kernel/drv/usbprn
-rm kernel/drv/ipsec*
-rm kernel/strmod/ipsec*
-rm kernel/drv/lofi*
-rm kernel/drv/tzmon*
-rm kernel/drv/iptun*
-rm kernel/fs/autofs
-rm kernel/sys/autofs
+rm kernel/drv/*/ecpp
+rm kernel/drv/ecpp.conf
+rm kernel/drv/*/usbprn
+rm kernel/drv/*/ipsec*
+rm kernel/drv/ipsec*.conf
+rm kernel/strmod/*/ipsec*
+rm kernel/drv/*/lofi
+rm kernel/drv/lofi.conf
+rm kernel/drv/*/tzmon
+rm kernel/drv/tzmon.conf
+rm kernel/drv/*/iptun
+rm kernel/drv/iptun.conf
+rm kernel/fs/*/autofs
+rm kernel/sys/*/autofs
 rm -fr kernel/kmdb
 rm -fr kernel/dacf
-rm kernel/drv/st kernel/drv/st.conf
-rm kernel/drv/usb_a*
+rm kernel/drv/*/st kernel/drv/st.conf
+rm kernel/drv/*/usb_a*
 rm kernel/strmod/usb_a*
+rm kernel/drv/*/mpt*
 rm kernel/drv/mpt*
-rm kernel/misc/cardbus
-rm kernel/misc/pcmcia
-rm kernel/strmod/usbwcm
-rm kernel/strmod/vuidm*
-rm kernel/drv/acpi_toshiba
-rm kernel/fs/lofs
-rm kernel/fs/dcfs
-rm kernel/sys/msgsys
-rm kernel/sys/semsys
-rm kernel/sys/shmsys
-rm kernel/drv/dtrace*
-rm kernel/drv/systrace*
-rm kernel/drv/lockstat*
-rm kernel/drv/fbt*
-rm kernel/drv/dcpc*
+rm kernel/misc/*/cardbus
+rm kernel/misc/*/pcmcia
+rm kernel/strmod/*/usbwcm
+rm kernel/strmod/*/vuidm*
+rm kernel/drv/*/acpi_toshiba
+rm kernel/fs/*/lofs
+rm kernel/fs/*/dcfs
+rm kernel/sys/*/msgsys
+rm kernel/sys/*/semsys
+rm kernel/sys/*/shmsys
+rm kernel/drv/*/dtrace
+rm kernel/drv/dtrace.conf
+rm kernel/drv/*/systrace
+rm kernel/drv/systrace.conf
+rm kernel/drv/*/lockstat
+rm kernel/drv/lockstat.conf
+rm kernel/drv/*/fbt
+rm kernel/drv/fbt.conf
+rm kernel/drv/*/dcpc
+rm kernel/drv/dcpc.conf
 rm -fr kernel/dtrace
-rm kernel/fs/hsfs
-rm kernel/sys/c2audit
+rm kernel/fs/*/hsfs
+rm kernel/sys/*/c2audit
+rm kernel/drv/*/fd*
 rm kernel/drv/fd*
 #
 rm etc/default/cron

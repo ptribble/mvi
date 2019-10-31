@@ -21,8 +21,6 @@ Arguments to the scripts are:
 
 The scripts take option arguments, some examples are:
 
- - 32bit means create a 32-bit kernel image, with 32-bit userland
- - 64bit means to remove 32-bit kernel components
  - node will install node packages and run a simple node.js server
  - vboxnet will set up networking appropriate for VirtualBox
  - virtio will add virtio packages
@@ -41,7 +39,7 @@ have tested qemu and VirtualBox.
 
 As an example:
 
-./mvix.sh 64bit node vboxnet
+./mvix.sh node vboxnet
 
 will create a minimal (25M) iso suitable for booting under VirtualBox,
 running a simple node webserver on http://192.168.56.56:8000
@@ -51,7 +49,7 @@ Adapter and make sure it's on the appropriate subnet.)
 
 Another example:
 
-./mvix.sh 64bit wipe
+./mvix.sh wipe
 
 will create a 15M iso suitable for wiping disk drives (it's using
 format/analyze/purge underneath, nothing complicated). This includes

@@ -30,10 +30,6 @@ ahci is in TRIBdrv-storage-ahci
 So don't need pcn at all
 
 
-Standard build at this point is a 192M (148M used) image that creates a 72M iso
-
-64bit is 144M (122M used) for a 56M iso
-
-32bit is 96M (79M used) image for a 39M iso
+Standard build at this point is a 144M (122M used) image that creates a 56M iso
 
 Unfortunately, strip doesn't work, in general
