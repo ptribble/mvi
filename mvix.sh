@@ -269,7 +269,7 @@ mkfile ${MRSIZE} /tmp/${MRSIZE}
 #
 # gzip doesn't like the sticky bit
 #
-chmod o-t /tmp/${MRSIZE}
+chmod -t /tmp/${MRSIZE}
 LOFIDEV=`lofiadm -a /tmp/${MRSIZE}`
 LOFINUM=`echo $LOFIDEV|awk -F/ '{print $NF}'`
 echo "y" | env NOINUSE_CHECK=1 newfs -o space -m 0 -i $NBPI /dev/rlofi/$LOFINUM
@@ -292,10 +292,12 @@ rm -fr ${BFS}/dev/zcons/*
 cd /
 DF=/usr/bin/df
 if [ -x /usr/gnu/bin/df ]; then
-    DF=/usr/gnu/bin/df
+  DF=/usr/gnu/bin/df
+  $DF -h $BFS
+  $DF -i $BFS
+else
+  $DF -h $BFS
 fi
-$DF -h $BFS
-$DF -i $BFS
 
 #
 # unmount, then compress the block device and copy it back
