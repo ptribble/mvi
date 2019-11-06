@@ -20,7 +20,6 @@ DISTVER=21.0
 THOME=${THOME:-/packages/localsrc/Tribblix}
 export THOME
 PROTO_DIR=${THOME}/illumos-pkgs-m${DISTVER}
-PKG_DIR=${THOME}
 INSTZAP=/usr/lib/zap/instzap
 if [ ! -x ${INSTZAP} ]; then
     INSTZAP=${THOME}/zap/usr/lib/zap/instzap

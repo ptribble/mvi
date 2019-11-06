@@ -30,7 +30,6 @@ fi
 ILVER=0.${DISTVER}
 
 PROTO_DIR=${THOME}/illumos-pkgs-m${DISTVER}
-PKG_DIR=${THOME}
 INSTZAP=/usr/lib/zap/instzap
 if [ ! -x ${INSTZAP} ]; then
     INSTZAP=${THOME}/zap/usr/lib/zap/instzap
@@ -50,6 +49,6 @@ do
     if [ -f ${PROTO_DIR}/pkgs/${pkg}.${ILVER}.0.zap ]; then
 	$INSTZAP -R $DESTDIR ${PROTO_DIR}/pkgs/${pkg}.${ILVER}.0.zap `echo $pkg | awk -F. '{print $1}'`
     else
-	$INSTZAP -R $DESTDIR ${PKG_DIR}/pkgs/${pkg}.zap `echo $pkg | awk -F. '{print $1}'`
+	$INSTZAP -R $DESTDIR ${THOME}/pkgs/${pkg}.zap `echo $pkg | awk -F. '{print $1}'`
     fi
 done
