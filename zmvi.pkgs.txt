@@ -1,0 +1,19 @@
+What provides the minimal baseline for a zone?
+
+SUNWcsd
+ - there's a minimal number of device entries you need for a system to
+ function
+
+SUNWcs
+ - common userland
+
+TRIBsys-library
+ - everything uses shared libraries, even Go
+
+TRIBsys-net
+ - if we ever did want networking in a zone, would supply dladm and
+ friends
+
+TRIBsys-lib-math
+ - for libm
+

@@ -11,7 +11,7 @@ ISO_NAME=/var/tmp/zmvi.tar.gz
 #
 # Tribblix version for illumos pkgs
 #
-DISTVER=21.0
+DISTVER=22
 
 #
 # *** CUSTOMIZE ***
@@ -36,9 +36,13 @@ fi
 MVI_DIR=${THOME}/mvi
 
 #
+# this is the starting list of packages, see zmvi.pkgs
+#
+PKG_LIST="zmvi"
+
+#
 # argument processing
 #
-PKG_LIST="mvi"
 INSTALL_PKGS=${MVI_DIR}/install-from-local.sh
 while getopts "frsp:v:" opt; do
     case $opt in
@@ -177,21 +181,17 @@ rm -fr var/saf var/opt var/cron var/idmap var/logadm
 rm -fr etc/rc?.d etc/init.d etc/cron.d etc/opt
 rm -f etc/rc?
 rm -fr etc/fs/hsfs etc/inet/ike etc/inet/secret
-rm -fr platform/i86xpv
-rm -fr boot/grub/pxegrub boot/grub/nbgrub
-rm -fr kernel/kiconv
 #
 # this is for a zone, we don't need any boot or kernel
 #
+rm -fr platform
 rm -fr boot
 rm -fr kernel
-rm -fr platform
 rm -fr devices
-mkdir devices
 rm -fr dev
 mkdir dev
-rmdir export home devices mnt opt
-rm reconfigure
+rmdir export home mnt opt
+rm -f reconfigure
 #
 # run any requested cleanup scripts
 # use . so they can set variables for us

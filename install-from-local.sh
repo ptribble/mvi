@@ -46,8 +46,9 @@ fi
 mkdir -p ${DESTDIR}
 for pkg in `cat ${PKGLIST}`
 do
-    if [ -f ${PROTO_DIR}/pkgs/${pkg}.${ILVER}.0.zap ]; then
-	$INSTZAP -R $DESTDIR ${PROTO_DIR}/pkgs/${pkg}.${ILVER}.0.zap `echo $pkg | awk -F. '{print $1}'`
+    echo ${PROTO_DIR}/pkgs/${pkg}.${ILVER}.zap
+    if [ -f ${PROTO_DIR}/pkgs/${pkg}.${ILVER}.zap ]; then
+	$INSTZAP -R $DESTDIR ${PROTO_DIR}/pkgs/${pkg}.${ILVER}.zap `echo $pkg | awk -F. '{print $1}'`
     else
 	$INSTZAP -R $DESTDIR ${THOME}/pkgs/${pkg}.zap `echo $pkg | awk -F. '{print $1}'`
     fi
