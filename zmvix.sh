@@ -178,9 +178,17 @@ rm -fr etc/svc/profile
 rm -fr etc/tm etc/saf etc/sasl etc/zfs etc/logadm.d
 rm -fr var/sadm var/svc var/mail var/spool var/preserve var/games
 rm -fr var/saf var/opt var/cron var/idmap var/logadm
-rm -fr etc/rc?.d etc/init.d etc/cron.d etc/opt
-rm -f etc/rc?
+rm -fr etc/rc?.d etc/init.d etc/cron.d etc/opt etc/dev
+rm -fr etc/rcm etc/dfs etc/dhcp etc/ftpd
+rm -f etc/rc? etc/ftpusers
 rm -fr etc/fs/hsfs etc/inet/ike etc/inet/secret
+rm -f etc/devlink.tab etc/dgroup.tab
+rm -f etc/fmthard etc/dumpdates etc/format etc/dcopy etc/clri etc/cron
+rm -f etc/cfgadm etc/format.dat etc/fsck etc/fsdb etc/grpck etc/install
+rm -f etc/mkfs etc/magic etc/mailcap etc/mime.types etc/mknod
+rm -f etc/prtconf etc/prtvtoc etc/reboot etc/remote etc/setmnt
+rm -fr etc/versions etc/sysevent etc/system.d
+rm -f etc/whodo etc/tar etc/swap etc/swapadd etc/sysdef
 #
 # this is for a zone, we don't need any boot or kernel
 #
