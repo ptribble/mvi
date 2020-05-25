@@ -40,7 +40,7 @@ MVI_DIR=${THOME}/mvi
 #
 PKG_LIST="mvi"
 INSTALL_PKGS=${MVI_DIR}/install-from-local.sh
-while getopts "frsp:v:" opt; do
+while getopts "frso:p:v:" opt; do
     case $opt in
 	f)
 	    # install from file system
@@ -59,6 +59,10 @@ while getopts "frsp:v:" opt; do
 	s)
 	    # install via system (direct zap)
 	    INSTALL_PKGS=${MVI_DIR}/install-with-zap.sh
+	    ;;
+	o)
+	    # output file
+	    ISO_NAME="$OPTARG"
 	    ;;
 	p)
 	    # name of file containing pkg list
