@@ -1,0 +1,2 @@
+#!/sbin/sh
+/opt/tribblix/nginx/sbin/nginx > /dev/console < /dev/null 2>&1 &
