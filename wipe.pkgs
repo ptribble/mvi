@@ -12,5 +12,5 @@ TRIBdrv-storage-nv-sata
 TRIBdrv-storage-si3124
 TRIBsys-libdiskmgt
 TRIBsvc-resource-pools
-TRIBlib-zlib.1.2.8.1
-TRIBlibxml2.2.9.3.0
+TRIBlib-zlib.1.2.11.0
+TRIBlibxml2.2.9.5.0

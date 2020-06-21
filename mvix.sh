@@ -11,7 +11,7 @@ ISO_NAME=/var/tmp/mvi.iso
 #
 # Tribblix version for illumos pkgs
 #
-DISTVER=21.0
+DISTVER=22
 
 #
 # *** CUSTOMIZE ***

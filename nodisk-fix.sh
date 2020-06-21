@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# analagous to nonet, remove all support for disks
+# analogous to nonet, remove all support for disks
 #
 rm -f kernel/drv/*/ata*
 rm -f kernel/drv/*/cmdk*

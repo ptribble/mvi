@@ -1,7 +1,7 @@
 MVI - Minimal Viable Illumos
 ============================
 
-These are some scripts I've used to build a minimal illumos iso
+These are some scripts I've used to build a minimal illumos image
 capable of running a single application.
 
 The scripts, particularly the paths embedded in them, are specific
