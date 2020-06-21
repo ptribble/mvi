@@ -2,7 +2,7 @@ lib/libkstat.so.1
 lib/librt.so.1
 lib/libsendfile.so.1
 usr/lib/libstdc++.so.6
-usr/lib/libstdc++.so.6.0.19
+usr/lib/libstdc++.so.6.0.24
 usr/lib/libgcc_s.so.1
 lib/libpthread.so.1
 usr/versions/node-v6/bin/node 
