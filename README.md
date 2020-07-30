@@ -66,3 +66,8 @@ stack). If you wish to get into the zone then you'll need to use zlogin
 with the -S flag. A full zlogin can be enabled with
 
 ./zmvix.sh node zlogin
+
+To use these zone images under tribblix, create an alien zone with the
+tarball the script creates as the image, for example:
+
+zap create-zone -z node-zone -t alien -i 192.168.0.219 -I /var/tmp/zmvi.tar.gz
