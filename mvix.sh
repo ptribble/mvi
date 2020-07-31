@@ -183,7 +183,11 @@ rm -fr etc/tm etc/saf etc/sasl etc/zfs etc/logadm.d
 rm -fr var/sadm var/svc var/mail var/spool var/preserve var/games
 rm -fr var/saf var/opt var/cron var/idmap var/logadm
 rm -fr etc/rc?.d etc/init.d etc/cron.d etc/opt
-rm -f etc/rc?
+rm -fr etc/rcm etc/dfs etc/dhcp etc/ftpd
+rm -f etc/rc? etc/ftpusers
+rm -f etc/devlink.tab etc/dgroup.tab
+rm -f etc/fmthard etc/dumpdates etc/format etc/dcopy etc/clri etc/cron
+rm -f etc/labelit etc/killall
 rm -fr etc/fs/hsfs etc/inet/ike etc/inet/secret
 rm -fr platform/i86xpv
 rm -fr boot/grub/pxegrub boot/grub/nbgrub

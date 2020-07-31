@@ -188,11 +188,19 @@ rm -f etc/rc? etc/ftpusers
 rm -fr etc/fs/hsfs etc/inet/ike etc/inet/secret
 rm -f etc/devlink.tab etc/dgroup.tab
 rm -f etc/fmthard etc/dumpdates etc/format etc/dcopy etc/clri etc/cron
+rm -f etc/labelit etc/killall
 rm -f etc/cfgadm etc/format.dat etc/fsck etc/fsdb etc/grpck etc/install
 rm -f etc/mkfs etc/magic etc/mailcap etc/mime.types etc/mknod
 rm -f etc/prtconf etc/prtvtoc etc/reboot etc/remote etc/setmnt
 rm -fr etc/versions etc/sysevent etc/system.d
 rm -f etc/whodo etc/tar etc/swap etc/swapadd etc/sysdef
+rm -fr etc/user_attr.d etc/security/auth_attr.d
+rm -fr etc/security/exec_attr.d etc/security/prof_attr.d
+rm -fr etc/security/audit etc/security/lib etc/security/dev
+rm -f etc/inet/ipsecinit.sample etc/inet/ipsecalgs
+rm -f etc/nsswitch.ad etc/nsswitch.ldap
+rmdir var/audit var/adm/exacct var/adm/streams var/adm/log
+rm -f var/adm/aculog var/adm/spellhist
 #
 # this is for a zone, we don't need any boot or kernel
 #
