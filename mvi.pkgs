@@ -10,7 +10,6 @@ TRIBsys-kernel-dtrace
 TRIBsys-net
 TRIBsys-lib-math
 TRIBsys-libdiskmgt
-TRIBsys-boot-grub
 TRIBsys-boot-loader
 TRIBsys-zones
 TRIBdrv-storage-ata

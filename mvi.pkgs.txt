@@ -7,7 +7,10 @@ TRIBdrv-i86pc-platform - has useful things like cmdk, asy
 TRIBsys-zones - contains libraries that might be needed by common
 utilities
 
-TRIBsys-boot-grub - needed as part of the ISO construction and boot
+TRIBshell-ksh93 - is a separate package in recent releases, and we do
+need a shell
+
+TRIBsys-boot-loader - needed as part of the ISO construction and boot
 
 consconfig_dacf needs usbser, so can't remove TRIBdrv-ser-usbser
 

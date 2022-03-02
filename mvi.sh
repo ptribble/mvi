@@ -308,20 +308,6 @@ smf::sysinit:/etc/mvi.rc
 _EOF
 
 #
-# add a grub menu
-#
-cat >> ${DESTDIR}/boot/grub/menu.lst << _EOF
-title minimal viable illumos
-kernel\$ /platform/i86pc/kernel/\$ISADIR/unix
-module\$ /platform/i86pc/boot_archive
-title minimal viable illumos (ttya)
-kernel\$ /platform/i86pc/kernel/\$ISADIR/unix -B console=ttya,input-device=ttya,output-device=ttya
-module\$ /platform/i86pc/boot_archive
-title Boot from hard disk
-rootnoverify (hd0)
-chainloader +1
-_EOF
-#
 # https://blogs.oracle.com/darren/entry/sending_a_break_to_opensolaris
 #
 cat >> ${DESTDIR}/etc/system << _EOF
@@ -415,7 +401,7 @@ rm -fr dev devices etc export home kernel lib licenses mnt opt proc root sbin sy
 #
 CDBOOT="boot/cdboot"
 UEFIBOOT="boot/efiboot.img"
-/usr/bin/mkisofs -N -l -R -U -d -D -o ${ISO_NAME} -b boot/grub/stage2_eltorito \
+/usr/bin/mkisofs -N -l -R -U -d -D -o ${ISO_NAME} \
 	-V "illumos" \
 	-allow-multidot -no-iso-translate -cache-inodes \
 	-c .catalog \
