@@ -81,7 +81,7 @@ shift $((OPTIND-1))
 # this is the size of the ramdisk we create and should match the size
 # of the packaged install
 #
-MRSIZE=96M
+MRSIZE=64M
 NBPI=16384
 
 #
@@ -183,7 +183,8 @@ rm -fr etc/tm etc/saf etc/sasl etc/zfs etc/logadm.d
 rm -fr var/sadm var/svc var/mail var/spool var/preserve var/games
 rm -fr var/saf var/opt var/cron var/idmap var/logadm
 rm -fr etc/rc?.d etc/init.d etc/cron.d etc/opt
-rm -fr etc/rcm etc/dfs etc/dhcp etc/ftpd
+rm -fr etc/rcm etc/dhcp etc/ftpd
+rm -f etc/dfs/dfstab etc/dfs/fstypes
 rm -f etc/rc? etc/ftpusers
 rm -f etc/devlink.tab etc/dgroup.tab
 rm -f etc/fmthard etc/dumpdates etc/format etc/dcopy etc/clri etc/cron
