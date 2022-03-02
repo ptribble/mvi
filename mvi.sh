@@ -11,7 +11,7 @@ ISO_NAME=/tmp/mvi.iso
 #
 # Tribblix version for illumos pkgs
 #
-DISTVER=22
+DISTVER=25
 
 #
 # *** CUSTOMIZE ***
@@ -327,12 +327,29 @@ _EOF
 cat >> ${DESTDIR}/etc/system << _EOF
 set pcplusmp:apic_kmdb_on_nmi=1
 _EOF
+#
+# create the uefi boot block
+#
+${THOME}/tribblix-build/uefi.sh ${DESTDIR}
 
 #
 # paranoia, we don't want a boot archive inside the boot archive
 #
 rm -f ${DESTDIR}/platform/i86pc/amd64/boot_archive
 rm -f ${DESTDIR}/platform/*/boot_archive
+
+#
+# the live boot has the 32-bit archive and no hash
+#
+cat > ${DESTDIR}/boot/conf.d/livemedia <<EOF
+boot_archive_load="YES"
+boot_archive_type="rootfs"
+boot_archive_name="/platform/i86pc/boot_archive"
+
+boot_archive.hash_load="NO"
+boot_archive.hash_type="hash"
+boot_archive.hash_name="/platform/i86pc/${ISADIR}/boot_archive.hash"
+EOF
 
 #
 # now we create a block device that will back a ufs file system
@@ -396,12 +413,20 @@ rm -fr dev devices etc export home kernel lib licenses mnt opt proc root sbin sy
 #
 # now make the iso
 #
-/usr/bin/mkisofs -o ${ISO_NAME} -b boot/grub/stage2_eltorito \
+CDBOOT="boot/cdboot"
+UEFIBOOT="boot/efiboot.img"
+/usr/bin/mkisofs -N -l -R -U -d -D -o ${ISO_NAME} -b boot/grub/stage2_eltorito \
+	-V "illumos" \
+	-allow-multidot -no-iso-translate -cache-inodes \
 	-c .catalog \
-	-no-emul-boot -boot-load-size 4 -boot-info-table -N -l -R -U \
-        -allow-multidot -no-iso-translate -cache-inodes -d -D \
-	-V "illumos" ${DESTDIR}
+	-b ${CDBOOT} -no-emul-boot -boot-load-size 4 -boot-info-table \
+	-eltorito-alt-boot -eltorito-platform efi \
+	-eltorito-boot ${UEFIBOOT} -no-emul-boot \
+	${DESTDIR}
 sync
+ls -lsh $ISO_NAME
+echo "Hybridizing"
+${THOME}/tribblix-build/hybridize-iso ${ISO_NAME} ${DESTDIR}
 ls -lsh $ISO_NAME
 
 #

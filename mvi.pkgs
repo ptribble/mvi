@@ -1,6 +1,7 @@
 SUNWcsd
 SUNWcs
 TRIBsys-library
+TRIBshell-ksh93
 TRIBsys-kernel
 TRIBdrv-ser-usbser
 TRIBsys-kernel-platform
@@ -10,6 +11,7 @@ TRIBsys-net
 TRIBsys-lib-math
 TRIBsys-libdiskmgt
 TRIBsys-boot-grub
+TRIBsys-boot-loader
 TRIBsys-zones
 TRIBdrv-storage-ata
 TRIBdrv-storage-ahci
