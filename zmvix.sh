@@ -11,7 +11,7 @@ ISO_NAME=/var/tmp/zmvi.tar.gz
 #
 # Tribblix version for illumos pkgs
 #
-DISTVER=22
+DISTVER=28
 
 #
 # *** CUSTOMIZE ***

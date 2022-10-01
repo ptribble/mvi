@@ -1,4 +1,5 @@
 TRIBdrv-misc-virtio
 TRIBdrv-storage-blkdev
 TRIBdrv-storage-vioblk
+TRIBdrv-storage-vioscsi
 TRIBdrv-net-vioif
