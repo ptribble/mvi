@@ -1,1 +1,3 @@
-usr/versions/node-v6/bin/i86
+lib/amd64
+usr/lib/amd64
+usr/versions/node-v16/bin

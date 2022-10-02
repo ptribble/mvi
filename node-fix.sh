@@ -15,14 +15,11 @@ EOF
 #
 # we don't need all of this
 #
-rm -fr usr/versions/node-v6/include
-rm -fr usr/versions/node-v6/share
-# assume a 32-bit node binary
-rm -f usr/lib/amd64/libgcc_s.*
-rm -f usr/lib/amd64/libstdc++.so*
-rm -f usr/versions/node-v6/bin/amd64/node
-rm -f usr/versions/node-v6/bin/node
-mv usr/versions/node-v6/bin/i86/node usr/versions/node-v6/bin/node
+rm -fr usr/versions/node-v16/include
+rm -fr usr/versions/node-v16/share
+# node is pure 64-bit
+rm -f usr/lib/libgcc_s.*
+rm -f usr/lib/libstdc++.so*
 
 #
 # modify MRSIZE
