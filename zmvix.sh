@@ -5,11 +5,13 @@
 
 #
 # where the output should end up
+# override with -o
 #
 ISO_NAME=/var/tmp/zmvi.tar.gz
 
 #
 # Tribblix version for illumos pkgs
+# override with -v
 #
 DISTVER=28
 

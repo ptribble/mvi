@@ -5,11 +5,13 @@
 
 #
 # where the iso should end up
+# override with -o
 #
 ISO_NAME=/var/tmp/mvi.iso
 
 #
 # Tribblix version for illumos pkgs
+# override with -v
 #
 DISTVER=28
 
