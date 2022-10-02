@@ -10,6 +10,9 @@ SUNWcs
 TRIBsys-library
  - everything uses shared libraries, even Go
 
+TRIBshell-ksh93
+ - ksh is now a separate package
+
 TRIBsys-net
  - if we ever did want networking in a zone, would supply dladm and
  friends
