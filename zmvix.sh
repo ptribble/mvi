@@ -203,6 +203,8 @@ rm -f etc/inet/ipsecinit.sample etc/inet/ipsecalgs
 rm -f etc/nsswitch.ad etc/nsswitch.ldap
 rmdir var/audit var/adm/exacct var/adm/streams var/adm/log
 rm -f var/adm/aculog var/adm/spellhist
+rm -f etc/mount etc/mountall etc/umount etc/umountall
+rm -f etc/logadm.conf etc/utmpx etc/wtmpx etc/dacf.conf
 #
 # this is for a zone, we don't need any boot or kernel
 #
