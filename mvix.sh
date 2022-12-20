@@ -254,7 +254,7 @@ _EOF
 #
 # create the uefi boot block
 #
-${THOME}/tribblix-build/uefi.sh ${DESTDIR}
+${MVI_DIR}/uefi.sh ${DESTDIR}
 
 #
 # paranoia, we don't want a boot archive inside the boot archive
@@ -356,7 +356,7 @@ UEFIBOOT="boot/efiboot.img"
 sync
 ls -lsh $ISO_NAME
 echo "Hybridizing"
-${THOME}/tribblix-build/hybridize-iso ${ISO_NAME} ${DESTDIR}
+${MVI_DIR}/hybridize-iso ${ISO_NAME} ${DESTDIR}
 ls -lsh $ISO_NAME
 
 #
