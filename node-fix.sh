@@ -15,8 +15,8 @@ EOF
 #
 # we don't need all of this
 #
-rm -fr usr/versions/node-v16/include
-rm -fr usr/versions/node-v16/share
+rm -fr usr/versions/node-v18/include
+rm -fr usr/versions/node-v18/share
 # node is pure 64-bit
 rm -f usr/lib/libgcc_s.*
 rm -f usr/lib/libstdc++.so*
