@@ -1,0 +1,12 @@
+#!/sbin/sh
+#
+# this configures a static IP address on vioif0
+#
+# the address here should match that of the bhyve zone you're going to boot
+#
+IFNAME="vioif0"
+IFADDR="192.168.0.233/24"
+
+/sbin/ifconfig $IFNAME plumb
+env SMF_FMRI=svc/net/ip:d /lib/inet/ipmgmtd
+/sbin/ifconfig $IFNAME inet $IFADDR up

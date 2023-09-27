@@ -23,6 +23,7 @@ The scripts take option arguments, some examples are:
 
  - node will install node packages and run a simple node.js server
  - vboxnet will set up networking appropriate for VirtualBox
+ - bhyvenet will set up networking appropriate for bhyve
  - virtio will add virtio packages
 
 For any argument foo, there may be some files:
