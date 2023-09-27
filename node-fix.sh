@@ -23,7 +23,8 @@ rm -f usr/lib/libstdc++.so*
 
 #
 # modify MRSIZE
+# the node binary itself is 107M, lib is about 12M
 #
 TSIZE=`echo $MRSIZE | sed s:M::`
-TSIZE=$(($TSIZE+36))
+TSIZE=$(($TSIZE+120))
 MRSIZE=${TSIZE}M

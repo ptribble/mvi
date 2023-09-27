@@ -38,6 +38,7 @@ The intention here is that the system will often be booted under a hypervisor,
 allowing most of the drivers and support files to be eliminated by default. I
 have tested qemu and VirtualBox.
 
+
 As an example:
 
 ./mvix.sh node vboxnet
@@ -48,6 +49,22 @@ running a simple node webserver on http://192.168.56.56:8000
 (For this to work you'll need to set up the VM network to be a Host-only
 Adapter and make sure it's on the appropriate subnet.)
 
+Similarly, to run the same thing under bhyve
+
+./mvix.sh node virtio bhyvenet
+
+will create a minimal iso that can be booted under bhyve. You can create
+the bhyve zone on Tribblix like so:
+
+zap create-zone -t bhyve \
+-z mvi1 -x 192.168.0.233  \
+-m 512M \
+-I /var/tmp/mvi.iso \
+-V 1G
+
+and the node webserver will be running on http://192.168.0.233:8000
+
+
 Another example:
 
 ./mvix.sh wipe
@@ -56,12 +73,13 @@ will create a 15M iso suitable for wiping disk drives (it's using
 format/analyze/purge underneath, nothing complicated). This includes
 most of the common storage drivers, so will boot on real hardware.
 
+
 There's also a variant that can create a tarball suitable for unpacking as
 the filesystem for a zone. In this case we don't need any drivers. For example
 
 ./zmvix.sh nonet node
 
-will create a 11M compressed tarball containing enough to run the same
+will create a compressed tarball containing enough to run the same
 simple node webserver above in a zone (this assumes a shared-ip network
 stack). If you wish to get into the zone then you'll need to use zlogin
 with the -S flag. A full zlogin can be enabled with

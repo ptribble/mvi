@@ -7,6 +7,15 @@
 IFNAME="vioif0"
 IFADDR="192.168.0.233/24"
 
+#
+# we need devfsadm to ensure the system picks up the vioif interface
+#
+/usr/sbin/devfsadm
+
+#
+# networking requires certain daemons be up and running
+#
+env SMF_FMRI=svc/net/ip:d /sbin/dlmgmtd
 /sbin/ifconfig $IFNAME plumb
 env SMF_FMRI=svc/net/ip:d /lib/inet/ipmgmtd
 /sbin/ifconfig $IFNAME inet $IFADDR up

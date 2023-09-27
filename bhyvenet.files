@@ -1,0 +1,5 @@
+lib/libdevinfo.so.1
+usr/lib/devfsadm/linkmod/SUNW_misc_link.so
+usr/sbin/devfsadm
+lib/libsysevent.so.1
+sbin/dlmgmtd
