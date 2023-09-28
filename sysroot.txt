@@ -1,0 +1,10 @@
+You could also use mvi to generate a sysroot, like
+
+https://github.com/illumos/sysroot
+
+All that basically contains is the files from
+
+system/header = TRIBsys-header
+system/library = TRIBsys-library
+system/library/math = TRIBsys-lib-math
+system/library/c-runtime = TRIBsys-lib-c-runtime
