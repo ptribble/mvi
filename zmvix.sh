@@ -32,6 +32,11 @@ ISO_NAME=/var/tmp/zmvi.tar.gz
 #
 DISTVER=34
 
+bail(){
+    echo "ERROR: $1"
+    exit 1
+}
+
 #
 # *** CUSTOMIZE ***
 # where your illumos and other packages live
@@ -40,12 +45,11 @@ THOME=${THOME:-/packages/localsrc/Tribblix}
 export THOME
 PROTO_DIR=${THOME}/illumos-pkgs-m${DISTVER}
 INSTZAP=/usr/lib/zap/instzap
-if [ ! -x ${INSTZAP} ]; then
+if [ ! -x "${INSTZAP}" ]; then
     INSTZAP=${THOME}/zap/usr/lib/zap/instzap
 fi
-if [ ! -x ${INSTZAP} ]; then
-    echo "ERROR: unable to find instzap"
-    exit 1
+if [ ! -x "${INSTZAP}" ]; then
+    bail "unable to find instzap"
 fi
 
 #
@@ -68,9 +72,8 @@ while getopts "frso:p:v:" opt; do
 	f)
 	    # install from file system
 	    INSTALL_PKGS=${MVI_DIR}/install-from-local.sh
-	    if [ ! -d $PROTO_DIR ]; then
-		echo "ERROR: unable to find packages area $PROTO_DIR"
-		exit 1
+	    if [ ! -d "$PROTO_DIR" ]; then
+		bail "unable to find packages area $PROTO_DIR"
 	    fi
 	    ;;
 	r)
@@ -96,6 +99,9 @@ while getopts "frso:p:v:" opt; do
 	    DISTVER="$OPTARG"
 	    PROTO_DIR=${THOME}/illumos-pkgs-m${DISTVER}
 	    ;;
+	*)
+	    bail "invalid argument $opt"
+	    ;;
     esac
 done
 shift $((OPTIND-1))
@@ -108,42 +114,37 @@ DESTDIR=/tmp/mvi.$$
 #
 # bail if something is already there
 #
-if [ -d $DESTDIR ]; then
-    echo "ERROR: $DESTDIR already exists"
-    exit 1
+if [ -d "$DESTDIR" ]; then
+    bail "$DESTDIR already exists"
 fi
-if [ -f $DESTDIR ]; then
-    echo "ERROR: $DESTDIR already exists (as a file)"
-    exit 1
+if [ -f "$DESTDIR" ]; then
+    bail "$DESTDIR already exists (as a file)"
 fi
 #
 # check we have input to deal with
 #
-if [ ! -d $MVI_DIR ]; then
-    echo "ERROR: unable to find mvi area $MVI_DIR"
-    exit 1
+if [ ! -d "$MVI_DIR" ]; then
+    bail "unable to find mvi area $MVI_DIR"
 fi
-if [ ! -x ${INSTALL_PKGS} ]; then
-    echo "ERROR: unable to find install script ${INSTALL_PKGS}"
-    exit 1
+if [ ! -x "${INSTALL_PKGS}" ]; then
+    bail "unable to find install script ${INSTALL_PKGS}"
 fi
-if [ ! -f ${MVI_DIR}/${PKG_LIST}.pkgs ]; then
-    echo "ERROR: unable to find package list ${MVI_DIR}/${PKG_LIST}.pkgs"
-    exit 1
+if [ ! -f "${MVI_DIR}/${PKG_LIST}.pkgs" ]; then
+    bail "unable to find package list ${MVI_DIR}/${PKG_LIST}.pkgs"
 fi
 
 #
 # clean up and populate
 #
-${INSTALL_PKGS} ${DISTVER} ${DESTDIR} ${MVI_DIR}/${PKG_LIST}.pkgs
+${INSTALL_PKGS} "${DISTVER}" ${DESTDIR} "${MVI_DIR}/${PKG_LIST}.pkgs"
 
 #
 # these are options
 #
-for xopt in $*
+for xopt in "$@"
 do
-    if [ -f ${MVI_DIR}/${xopt}.pkgs ]; then
-	${INSTALL_PKGS} ${DISTVER} ${DESTDIR} ${MVI_DIR}/${xopt}.pkgs
+    if [ -f "${MVI_DIR}/${xopt}.pkgs" ]; then
+	${INSTALL_PKGS} "${DISTVER}" ${DESTDIR} "${MVI_DIR}/${xopt}.pkgs"
     fi
 done
 
@@ -152,39 +153,39 @@ done
 # here we start from nothing and add files (using the installed packages
 # as a stage)
 #
-cd ${DESTDIR}
+cd ${DESTDIR} || bail "cannot cd to ${DESTDIR}"
 mkdir stage
 mv usr lib sbin stage
 mkdir usr sbin lib lib/inet usr/lib usr/sbin usr/bin usr/bin/i86 usr/bin/amd64
 #
 # need init and sh
 #
-for file in `grep -v '^#' ${MVI_DIR}/mvi.dirs`
+for file in $(grep -v '^#' "${MVI_DIR}/mvi.dirs")
 do
-  mkdir -p $file
+  mkdir -p "$file"
 done
 # need getent, see user_cmd in the brand's config.xml
 # that will enable zlogin -S
 # if you need zlogin, then look at zlogin.files
-for file in `grep -v '^#' ${MVI_DIR}/mvi.files` usr/bin/getent
+for file in $(grep -v '^#' "${MVI_DIR}/mvi.files") usr/bin/getent
 do
-  mv stage/$file $file
+  mv stage/"$file" "$file"
 done
 #
 # add specific files from the options
 #
-for xopt in $*
+for xopt in "$@"
 do
-    if [ -f ${MVI_DIR}/${xopt}.dirs ]; then
-	for file in `grep -v '^#' ${MVI_DIR}/${xopt}.dirs`
+    if [ -f "${MVI_DIR}/${xopt}.dirs" ]; then
+	for file in $(grep -v '^#' "${MVI_DIR}/${xopt}.dirs")
 	do
-	    mkdir -p $file
+	    mkdir -p "$file"
 	done
     fi
-    if [ -f ${MVI_DIR}/${xopt}.files ]; then
-	for file in `grep -v '^#' ${MVI_DIR}/${xopt}.files`
+    if [ -f "${MVI_DIR}/${xopt}.files" ]; then
+	for file in $(grep -v '^#' "${MVI_DIR}/${xopt}.files")
 	do
-	    mv stage/$file $file
+	    mv stage/"$file" "$file"
 	done
     fi
 done
@@ -237,11 +238,11 @@ rm -f reconfigure
 # run any requested cleanup scripts
 # use . so they can set variables for us
 #
-for xopt in $*
+for xopt in "$@"
 do
-    if [ -f ${MVI_DIR}/${xopt}-fix.sh ]; then
+    if [ -f "${MVI_DIR}/${xopt}-fix.sh" ]; then
 	echo "Running ${xopt}-fix.sh"
-	. ${MVI_DIR}/${xopt}-fix.sh
+	. "${MVI_DIR}/${xopt}-fix.sh"
     fi
 done
 #
@@ -249,15 +250,15 @@ done
 # this is a script so (a) we can emit a message saying we're ready,
 # and (b) it's extensible
 #
-cd ${DESTDIR}
+cd ${DESTDIR} || bail "cannot cd to ${DESTDIR}"
 cat > ${DESTDIR}/etc/mvi.rc <<EOF
 #!/sbin/sh
 EOF
-for xopt in $*
+for xopt in "$@"
 do
-    if [ -f ${MVI_DIR}/${xopt}.rc ]; then
-	cp ${MVI_DIR}/${xopt}.rc ${DESTDIR}/etc/mvi-${xopt}.rc
-	chmod a+x ${DESTDIR}/etc/mvi-${xopt}.rc
+    if [ -f "${MVI_DIR}/${xopt}.rc" ]; then
+	cp "${MVI_DIR}/${xopt}.rc" "${DESTDIR}/etc/mvi-${xopt}.rc"
+	chmod a+x "${DESTDIR}/etc/mvi-${xopt}.rc"
 cat >> ${DESTDIR}/etc/mvi.rc <<EOF
 echo " *** Running ${xopt} startup ***" > /dev/console
 /etc/mvi-${xopt}.rc >/dev/console 2>&1 </dev/console
@@ -282,14 +283,14 @@ _EOF
 #
 # if we don't have bash, fix up the passwd file
 #
-cd ${DESTDIR}
+cd ${DESTDIR} || bail "cannot cd to ${DESTDIR}"
 if [ ! -f usr/bin/bash ]; then
     gsed -i s:/bash:/sh: etc/passwd
 fi
 
-cd ${DESTDIR}
-tar cfz $ISO_NAME  *
-ls -lsh $ISO_NAME
+cd ${DESTDIR} || bail "cannot cd to ${DESTDIR}"
+tar cfz "$ISO_NAME" *
+ls -lsh "$ISO_NAME"
 
 #
 # and clean up

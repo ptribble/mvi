@@ -91,6 +91,6 @@ rm etc/rpc
 #
 # modify MRSIZE
 #
-TSIZE=`echo $MRSIZE | sed s:M::`
-TSIZE=$(($TSIZE-4))
+TSIZE=$(echo $MRSIZE | sed s:M::)
+TSIZE=$((TSIZE-4))
 MRSIZE=${TSIZE}M

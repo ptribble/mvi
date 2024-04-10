@@ -44,6 +44,6 @@ rm -f etc/default/mpathd
 #
 # modify MRSIZE
 #
-TSIZE=`echo $MRSIZE | sed s:M::`
-TSIZE=$(($TSIZE-1))
+TSIZE=$(echo $MRSIZE | sed s:M::)
+TSIZE=$((TSIZE-1))
 MRSIZE=${TSIZE}M

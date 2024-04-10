@@ -32,6 +32,11 @@ ISO_NAME=/var/tmp/mvi.iso
 #
 DISTVER=34
 
+bail(){
+    echo "ERROR: $1"
+    exit 1
+}
+
 #
 # *** CUSTOMIZE ***
 # where your illumos and other packages live
@@ -40,12 +45,11 @@ THOME=${THOME:-/packages/localsrc/Tribblix}
 export THOME
 PROTO_DIR=${THOME}/illumos-pkgs-m${DISTVER}
 INSTZAP=/usr/lib/zap/instzap
-if [ ! -x ${INSTZAP} ]; then
+if [ ! -x "${INSTZAP}" ]; then
     INSTZAP=${THOME}/zap/usr/lib/zap/instzap
 fi
-if [ ! -x ${INSTZAP} ]; then
-    echo "ERROR: unable to find instzap"
-    exit 1
+if [ ! -x "${INSTZAP}" ]; then
+    bail "unable to find instzap"
 fi
 
 #
@@ -64,9 +68,8 @@ while getopts "frso:p:v:" opt; do
 	f)
 	    # install from file system
 	    INSTALL_PKGS=${MVI_DIR}/install-from-local.sh
-	    if [ ! -d $PROTO_DIR ]; then
-		echo "ERROR: unable to find packages area $PROTO_DIR"
-		exit 1
+	    if [ ! -d "$PROTO_DIR" ]; then
+		bail "unable to find packages area $PROTO_DIR"
 	    fi
 	    ;;
 	r)
@@ -92,6 +95,9 @@ while getopts "frso:p:v:" opt; do
 	    DISTVER="$OPTARG"
 	    PROTO_DIR=${THOME}/illumos-pkgs-m${DISTVER}
 	    ;;
+	*)
+	    bail "invalid argument $opt"
+	    ;;
     esac
 done
 shift $((OPTIND-1))
@@ -111,42 +117,37 @@ DESTDIR=/tmp/mvi.$$
 #
 # bail if something is already there
 #
-if [ -d $DESTDIR ]; then
-    echo "ERROR: $DESTDIR already exists"
-    exit 1
+if [ -d "$DESTDIR" ]; then
+    bail "$DESTDIR already exists"
 fi
-if [ -f $DESTDIR ]; then
-    echo "ERROR: $DESTDIR already exists (as a file)"
-    exit 1
+if [ -f "$DESTDIR" ]; then
+    bail "$DESTDIR already exists (as a file)"
 fi
 #
 # check we have input to deal with
 #
-if [ ! -d $MVI_DIR ]; then
-    echo "ERROR: unable to find mvi area $MVI_DIR"
-    exit 1
+if [ ! -d "$MVI_DIR" ]; then
+    bail "unable to find mvi area $MVI_DIR"
 fi
-if [ ! -x ${INSTALL_PKGS} ]; then
-    echo "ERROR: unable to find install script ${INSTALL_PKGS}"
-    exit 1
+if [ ! -x "${INSTALL_PKGS}" ]; then
+    bail "unable to find install script ${INSTALL_PKGS}"
 fi
-if [ ! -f ${MVI_DIR}/${PKG_LIST}.pkgs ]; then
-    echo "ERROR: unable to find package list ${MVI_DIR}/${PKG_LIST}.pkgs"
-    exit 1
+if [ ! -f "${MVI_DIR}/${PKG_LIST}.pkgs" ]; then
+    bail "unable to find package list ${MVI_DIR}/${PKG_LIST}.pkgs"
 fi
 
 #
 # clean up and populate
 #
-${INSTALL_PKGS} ${DISTVER} ${DESTDIR} ${MVI_DIR}/${PKG_LIST}.pkgs
+${INSTALL_PKGS} "${DISTVER}" ${DESTDIR} "${MVI_DIR}/${PKG_LIST}.pkgs"
 
 #
 # these are options
 #
-for xopt in $*
+for xopt in "$@"
 do
-    if [ -f ${MVI_DIR}/${xopt}.pkgs ]; then
-	${INSTALL_PKGS} ${DISTVER} ${DESTDIR} ${MVI_DIR}/${xopt}.pkgs
+    if [ -f "${MVI_DIR}/${xopt}.pkgs" ]; then
+	${INSTALL_PKGS} "${DISTVER}" ${DESTDIR} "${MVI_DIR}/${xopt}.pkgs"
     fi
 done
 
@@ -155,36 +156,36 @@ done
 # here we start from nothing and add files (using the installed packages
 # as a stage)
 #
-cd ${DESTDIR}
+cd ${DESTDIR} || bail "cannot cd to ${DESTDIR}"
 mkdir stage
 mv usr lib sbin stage
 mkdir usr sbin lib lib/inet usr/lib usr/sbin usr/bin usr/bin/i86 usr/bin/amd64
 #
 # need init and sh
 #
-for file in `grep -v '^#' ${MVI_DIR}/mvi.dirs`
+for file in $(grep -v '^#' "${MVI_DIR}/mvi.dirs")
 do
-  mkdir -p $file
+  mkdir -p "$file"
 done
-for file in `grep -v '^#' ${MVI_DIR}/mvi.files`
+for file in $(grep -v '^#' "${MVI_DIR}/mvi.files")
 do
-  mv stage/$file $file
+  mv stage/"$file" "$file"
 done
 #
 # add specific files from the options
 #
-for xopt in $*
+for xopt in "$@"
 do
-    if [ -f ${MVI_DIR}/${xopt}.dirs ]; then
-	for file in `grep -v '^#' ${MVI_DIR}/${xopt}.dirs`
+    if [ -f "${MVI_DIR}/${xopt}.dirs" ]; then
+	for file in $(grep -v '^#' "${MVI_DIR}/${xopt}.dirs")
 	do
-	    mkdir -p $file
+	    mkdir -p "$file"
 	done
     fi
-    if [ -f ${MVI_DIR}/${xopt}.files ]; then
-	for file in `grep -v '^#' ${MVI_DIR}/${xopt}.files`
+    if [ -f "${MVI_DIR}/${xopt}.files" ]; then
+	for file in $(grep -v '^#' "${MVI_DIR}/${xopt}.files")
 	do
-	    mv stage/$file $file
+	    mv stage/"$file" "$file"
 	done
     fi
 done
@@ -216,11 +217,11 @@ rm -fr kernel/kiconv
 # run any requested cleanup scripts
 # use . so they can set variables for us
 #
-for xopt in $*
+for xopt in "$@"
 do
-    if [ -f ${MVI_DIR}/${xopt}-fix.sh ]; then
+    if [ -f "${MVI_DIR}/${xopt}-fix.sh" ]; then
 	echo "Running ${xopt}-fix.sh"
-	. ${MVI_DIR}/${xopt}-fix.sh
+	. "${MVI_DIR}/${xopt}-fix.sh"
     fi
 done
 #
@@ -228,7 +229,7 @@ done
 # this is a script so (a) we can emit a message saying we're ready,
 # and (b) it's extensible
 #
-cd ${DESTDIR}
+cd ${DESTDIR} || bail "cannot cd to ${DESTDIR}"
 cat > ${DESTDIR}/etc/mvi.rc <<EOF
 #!/sbin/sh
 if [ ! -f /startup ]; then
@@ -236,11 +237,11 @@ if [ ! -f /startup ]; then
   echo "y" > /startup
 fi
 EOF
-for xopt in $*
+for xopt in "$@"
 do
-    if [ -f ${MVI_DIR}/${xopt}.rc ]; then
-	cp ${MVI_DIR}/${xopt}.rc ${DESTDIR}/etc/mvi-${xopt}.rc
-	chmod a+x ${DESTDIR}/etc/mvi-${xopt}.rc
+    if [ -f "${MVI_DIR}/${xopt}.rc" ]; then
+	cp "${MVI_DIR}/${xopt}.rc" "${DESTDIR}/etc/mvi-${xopt}.rc"
+	chmod a+x "${DESTDIR}/etc/mvi-${xopt}.rc"
 cat >> ${DESTDIR}/etc/mvi.rc <<EOF
 echo " *** Running ${xopt} startup ***" > /dev/console
 /etc/mvi-${xopt}.rc >/dev/console 2>&1 </dev/console
@@ -301,15 +302,15 @@ mkfile ${MRSIZE} /tmp/${MRSIZE}
 # gzip doesn't like the sticky bit
 #
 chmod -t /tmp/${MRSIZE}
-LOFIDEV=`lofiadm -a /tmp/${MRSIZE}`
-LOFINUM=`echo $LOFIDEV|awk -F/ '{print $NF}'`
-echo "y" | env NOINUSE_CHECK=1 newfs -o space -m 0 -i $NBPI /dev/rlofi/$LOFINUM
+LOFIDEV=$(lofiadm -a /tmp/${MRSIZE})
+LOFINUM=$(echo "$LOFIDEV"|awk -F/ '{print $NF}')
+echo "y" | env NOINUSE_CHECK=1 newfs -o space -m 0 -i $NBPI /dev/rlofi/"$LOFINUM"
 BFS=/tmp/nb.$$
 mkdir $BFS
-mount -Fufs -o nologging $LOFIDEV $BFS
-cd ${DESTDIR}
+mount -Fufs -o nologging "$LOFIDEV" $BFS
+cd ${DESTDIR} || bail "cannot cd to ${DESTDIR}"
 tar cf - . | ( cd $BFS ; tar xf -)
-cd $BFS
+cd $BFS || bail "cannot cd to $BFS"
 touch etc/mnttab
 mkdir -p dev/fd devices/pseudo opt var var/run mnt
 /usr/sbin/devfsadm -r ${BFS}
@@ -334,7 +335,7 @@ fi
 # unmount, then compress the block device and copy it back
 #
 umount $BFS
-lofiadm -d /dev/lofi/$LOFINUM
+lofiadm -d /dev/lofi/"$LOFINUM"
 gzip /tmp/${MRSIZE}
 cp /tmp/${MRSIZE}.gz ${DESTDIR}/platform/i86pc/boot_archive
 rm /tmp/${MRSIZE}.gz
@@ -347,7 +348,7 @@ ls -lsh ${DESTDIR}/platform/i86pc/boot_archive
 #
 # all we need on the ISO is the platform and boot directories
 #
-cd ${DESTDIR}
+cd ${DESTDIR} || bail "cannot cd to ${DESTDIR}"
 rm bin
 rm -fr dev devices etc export home kernel lib licenses mnt opt proc root sbin system tmp usr var
 rm -fr platform/i86pc/ucode
@@ -362,7 +363,7 @@ rm -fr platform/i86pc/kernel/misc
 #
 CDBOOT="boot/cdboot"
 UEFIBOOT="boot/efiboot.img"
-/usr/bin/mkisofs -N -l -R -U -d -D -o ${ISO_NAME} \
+/usr/bin/mkisofs -N -l -R -U -d -D -o "${ISO_NAME}" \
 	-V "illumos" \
 	-allow-multidot -no-iso-translate -cache-inodes \
 	-c .catalog \
@@ -371,10 +372,10 @@ UEFIBOOT="boot/efiboot.img"
 	-eltorito-boot ${UEFIBOOT} -no-emul-boot \
 	${DESTDIR}
 sync
-ls -lsh $ISO_NAME
+ls -lsh "$ISO_NAME"
 echo "Hybridizing"
-${MVI_DIR}/hybridize-iso ${ISO_NAME} ${DESTDIR}
-ls -lsh $ISO_NAME
+${MVI_DIR}/hybridize-iso "${ISO_NAME}" ${DESTDIR}
+ls -lsh "$ISO_NAME"
 
 #
 # and clean up

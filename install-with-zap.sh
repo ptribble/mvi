@@ -39,8 +39,8 @@ if [ ! -x ${INSTZAP} ]; then
     exit 1
 fi
 
-mkdir -p ${DESTDIR}
-for pkg in `cat ${PKGLIST}`
+mkdir -p "${DESTDIR}"
+for pkg in $(<"${PKGLIST}")
 do
-    $INSTZAP -R $DESTDIR `echo $pkg | awk -F. '{print $1}'`
+    $INSTZAP -R "$DESTDIR" $(echo "$pkg" | awk -F. '{print $1}')
 done

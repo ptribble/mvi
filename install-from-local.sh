@@ -51,21 +51,21 @@ INSTZAP=/usr/lib/zap/instzap
 if [ ! -x ${INSTZAP} ]; then
     INSTZAP=${THOME}/zap/usr/lib/zap/instzap
 fi
-if [ ! -x ${INSTZAP} ]; then
+if [ ! -x "${INSTZAP}" ]; then
     echo "ERROR: unable to find instzap"
     exit 1
 fi
-if [ ! -d ${PROTO_DIR}/pkgs ]; then
+if [ ! -d "${PROTO_DIR}/pkgs" ]; then
     echo "ERROR: unable to find packages area ${PROTO_DIR}/pkgs"
     exit 1
 fi
 
-mkdir -p ${DESTDIR}
-for pkg in `cat ${PKGLIST}`
+mkdir -p "${DESTDIR}"
+for pkg in $(<"${PKGLIST}")
 do
-    if [ -f ${PROTO_DIR}/pkgs/${pkg}.${ILVER}.zap ]; then
-	$INSTZAP -R $DESTDIR ${PROTO_DIR}/pkgs/${pkg}.${ILVER}.zap `echo $pkg | awk -F. '{print $1}'`
+    if [ -f "${PROTO_DIR}/pkgs/${pkg}.${ILVER}.zap" ]; then
+	$INSTZAP -R "$DESTDIR" "${PROTO_DIR}/pkgs/${pkg}.${ILVER}.zap" $(echo "$pkg" | awk -F. '{print $1}')
     else
-	$INSTZAP -R $DESTDIR ${THOME}/pkgs/${pkg}.zap `echo $pkg | awk -F. '{print $1}'`
+	$INSTZAP -R "$DESTDIR" "${THOME}/pkgs/${pkg}.zap" $(echo "$pkg" | awk -F. '{print $1}')
     fi
 done

@@ -83,10 +83,10 @@ fi
 #
 DLIST=""
 if [[ -n "$WIPEALL" ]]; then
-    cd /dev/dsk
+    cd /dev/dsk || exit 1
     for drive in c*s2
     do
-	if [ ! -h /dev/removable-media/dsk/$drive ]; then
+	if [ ! -h "/dev/removable-media/dsk/$drive" ]; then
 	    drive=${drive/s2/}
 	    DLIST="${DLIST} ${drive}"
 	fi
@@ -96,26 +96,26 @@ if [[ -n "$WIPEALL" ]]; then
 	exit 1
     else
 	echo "Drive list is"
-	echo $DLIST
+	echo "$DLIST"
     fi
 else
-    cd /dev/dsk
-    for drive in $*
+    cd /dev/dsk || exit 1
+    for drive in "$@"
     do
 	#
 	# there's a complex dance here to normalize the drive name
 	#
 	drive=${drive/\/dev\/dsk\//}
-	if [ -h ${drive}s2 ]; then
+	if [ -h "${drive}s2" ]; then
 	    drive="${drive}s2"
 	fi
-	if [ -h /dev/dsk/${drive} ]; then
+	if [ -h "/dev/dsk/${drive}" ]; then
 	    drivel=${#drive}
 	    drivel=$((drivel-1))
 	    drivel=$((drivel-1))
 	    drive=${drive:0:$drivel}
 	    drive="${drive}s2"
-	    if [ -h /dev/removable-media/dsk/$drive ]; then
+	    if [ -h "/dev/removable-media/dsk/$drive" ]; then
 		echo "ERROR: $drive is removable, skipping"
 	    else
 		drive=${drive/s2/}
@@ -130,7 +130,7 @@ else
 	exit 1
     else
 	echo "Drive list is"
-	echo $DLIST
+	echo "$DLIST"
     fi
 fi
 
@@ -167,7 +167,7 @@ fi
 if [[ -n $BFLAG ]]; then
   for disk in $DLIST
   do
-    fdisk -B /dev/rdsk/${disk}p0
+    fdisk -B /dev/rdsk/"${disk}"p0
   done
 fi
 #
@@ -175,7 +175,7 @@ fi
 # do
 for disk in $DLIST
 do
-    format -f $FFILE -l /tmp/disk_wipe.${disk}.log $disk > /dev/null 2>&1 &
+    format -f $FFILE -l /tmp/disk_wipe."${disk}".log "$disk" > /dev/null 2>&1 &
     echo "log output is in /tmp/disk_wipe.${disk}.log"
 done
 # COUNT=$((COUNT-1))
