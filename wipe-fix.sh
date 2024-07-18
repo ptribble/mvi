@@ -236,4 +236,4 @@ rm -fr boot/solaris/bin
 #
 # 
 #
-export MRSIZE=40M
+export MRSIZE=44M
