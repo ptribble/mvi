@@ -1,5 +1,7 @@
 #!/bin/sh
 #
+# SPDX-License-Identifier: CDDL-1.0
+#
 # {{{ CDDL HEADER
 #
 # This file and its contents are supplied under the terms of the
@@ -16,7 +18,7 @@
 # Copyright 2024 Peter Tribble
 #
 
-cp ${THOME}/mvi/disk_wipe.sh wipe.sh
+cp "${THOME}/mvi/disk_wipe.sh" wipe.sh
 chmod a+x wipe.sh
 
 #
@@ -234,4 +236,4 @@ rm -fr boot/solaris/bin
 #
 # 
 #
-MRSIZE=40M
+export MRSIZE=40M

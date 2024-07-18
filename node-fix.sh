@@ -1,5 +1,7 @@
 #!/bin/sh
 #
+# SPDX-License-Identifier: CDDL-1.0
+#
 # {{{ CDDL HEADER
 #
 # This file and its contents are supplied under the terms of the
@@ -42,6 +44,6 @@ rm -f usr/lib/libstdc++.so*
 # modify MRSIZE
 # the node binary itself is 107M, lib is about 12M
 #
-TSIZE=$(echo "$MRSIZE" | sed s:M::)
+TSIZE=${MRSIZE/M/}
 TSIZE=$((TSIZE+120))
-MRSIZE=${TSIZE}M
+export MRSIZE=${TSIZE}M

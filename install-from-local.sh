@@ -1,5 +1,7 @@
 #!/bin/sh
 #
+# SPDX-License-Identifier: CDDL-1.0
+#
 # {{{ CDDL HEADER
 #
 # This file and its contents are supplied under the terms of the
@@ -48,8 +50,8 @@ ILVER=0.${DISTVER}
 
 PROTO_DIR=${THOME}/illumos-pkgs-m${DISTVER}
 INSTZAP=/usr/lib/zap/instzap
-if [ ! -x ${INSTZAP} ]; then
-    INSTZAP=${THOME}/zap/usr/lib/zap/instzap
+if [ ! -x "${INSTZAP}" ]; then
+    INSTZAP="${THOME}/zap/usr/lib/zap/instzap"
 fi
 if [ ! -x "${INSTZAP}" ]; then
     echo "ERROR: unable to find instzap"

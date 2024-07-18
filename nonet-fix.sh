@@ -1,5 +1,7 @@
 #!/bin/sh
 #
+# SPDX-License-Identifier: CDDL-1.0
+#
 # {{{ CDDL HEADER
 #
 # This file and its contents are supplied under the terms of the
@@ -91,6 +93,6 @@ rm etc/rpc
 #
 # modify MRSIZE
 #
-TSIZE=$(echo $MRSIZE | sed s:M::)
+TSIZE=${MRSIZE/M/}
 TSIZE=$((TSIZE-4))
-MRSIZE=${TSIZE}M
+export MRSIZE=${TSIZE}M

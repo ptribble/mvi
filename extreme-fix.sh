@@ -1,5 +1,7 @@
 #!/bin/sh
 #
+# SPDX-License-Identifier: CDDL-1.0
+#
 # {{{ CDDL HEADER
 #
 # This file and its contents are supplied under the terms of the
@@ -236,4 +238,4 @@ rm -fr platform/i86pc/ucode
 # we use about 22M of space
 # vbox will boot in 58M RAM
 #
-MRSIZE=22M
+export MRSIZE=22M
