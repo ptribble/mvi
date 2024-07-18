@@ -1,0 +1,259 @@
+#!/bin/ksh
+#
+# SPDX-License-Identifier: CDDL-1.0
+#
+# {{{ CDDL HEADER
+#
+# This file and its contents are supplied under the terms of the
+# Common Development and Distribution License ("CDDL"), version 1.0.
+# You may only use this file in accordance with the terms of version
+# 1.0 of the CDDL.
+#
+# A full copy of the text of the CDDL should have accompanied this
+# source. A copy of the CDDL is also available via the Internet at
+# http://www.illumos.org/license/CDDL.
+#
+# }}}
+#
+# Copyright 2024 Peter Tribble
+#
+
+#
+# normally, the way that installing a package from zap works is that
+# you unzip the zap file, then pkgadd the unpacked package
+#
+# this script emulates that, but doesn't need to run as root, nor does
+# it manage the package metadata, it simply unpacks the archive(s), copies
+# the files into place, and creates any links or extra directories
+#
+# there are assumptions baked into this about the way that zap files
+# get generated and the default layout they have
+#
+
+bail() {
+    echo "ERROR: $1"
+    exit 1
+}
+
+builtin mkdir
+builtin cp
+builtin chmod
+builtin ln
+builtin cat
+
+DESTDIR=""
+ZAPFILE=""
+RELOC="reloc"
+# TODO filter paths that won't exist in a zone
+ZONED=""
+# true for quiet, echo to see debug
+DEBUG=":"
+
+while getopts "R:Z" opt; do
+    case $opt in
+	R)
+	    DESTDIR=${OPTARG}
+	    ;;
+	Z)
+	    ZONED="yes"
+	    ;;
+	*)
+	    bail "invalid option"
+	    ;;
+    esac
+done
+shift $((OPTIND-1))
+
+case $# in
+    0)
+	echo "Usage: $0 -R directory zap_file [zap_file...]"
+	exit 1
+	;;
+esac
+
+#
+# sanity checks
+#
+for ZAPFILE in "$@"
+do
+    if [ ! -f "${ZAPFILE}" ]; then
+	bail "file ${ZAPFILE} not found"
+    fi
+    case ${ZAPFILE} in
+	*.zap)
+	    :
+	    ;;
+	*)
+	    bail "expecting a zap file"
+	    ;;
+    esac
+done
+	
+if [ -z "${DESTDIR}" ]; then
+    bail "destination directory not set"
+fi
+case $DESTDIR in
+    '/')
+	bail "destination directory cannot be /"
+	;;
+    /*)
+	:
+	;;
+    *)
+	bail "must use absolute path to destination"
+	;;
+esac
+
+#
+# filter out pathnames that should not exist in a zone
+#
+zone_allowed() {
+    [ -z "${ZONED}" ] && return 0
+    case $1 in
+	kernel*|platform*|usr/kernel*)
+	    return 1
+	    ;;
+    esac
+    return 0
+}
+
+#
+# put the objects into the alternate root
+#
+handle_dir() {
+    if [ -d "$DESTDIR/$1" ]; then
+	chmod "$2" "$DESTDIR/$1"
+    else
+	mkdir -p -m "$2" "$DESTDIR/$1"
+    fi
+    echo "d none ${1} ${2} ${3} ${4}" >> "${DESTDIR}/prototype"
+}
+handle_file() {
+    ndir=${1%/*}
+    if [ ! -d "$DESTDIR/${ndir}" ]; then
+	mkdir -p -m 755 "$DESTDIR/${ndir}"
+    fi
+    cp "$TDIR/${PKGNAME}/$RELOC/$1" "$DESTDIR/$1"
+    chmod "$2" "$DESTDIR/$1"
+    echo "${5} ${6} ${1}=${1} ${2} ${3} ${4}" >> "${DESTDIR}/prototype"
+}
+handle_softlink() {
+    lname=${1##*=}
+    rname=${1%%=*}
+    ndir=${rname%/*}
+    if [ ! -d "$DESTDIR/${ndir}" ]; then
+	mkdir -p -m 755 "$DESTDIR/${ndir}"
+    fi
+    ln -s "$lname" "$DESTDIR/$rname"
+    echo "s none ${1}" >> "${DESTDIR}/prototype"
+}
+handle_hardlink() {
+    lname=${1##*=}
+    rname=${1%%=*}
+    ndir=${rname%/*}
+    if [ ! -d "$DESTDIR/${ndir}" ]; then
+	mkdir -p -m 755 "$DESTDIR/${ndir}"
+    fi
+    # the hardlink target must be relative to the source name
+    ln "$DESTDIR/${ndir}/$lname" "$DESTDIR/$rname"
+    echo "l none ${1}" >> "${DESTDIR}/prototype"
+}
+
+#
+# we also populate a prototype file
+#
+mkdir -p -m 755 "${DESTDIR}"
+touch "${DESTDIR}/prototype"
+
+#
+# now loop over all the input zap files
+#
+for ZAPFILE in "$@"
+do
+    PKGNAME=${ZAPFILE##*/}
+    PKGNAME=${PKGNAME%%.*}
+
+VISH=$(digest -a md5 "${ZAPFILE}")
+TDIR=/tmp/zapadd.${VISH}.$$
+rm -fr "$TDIR"
+mkdir -p "$TDIR"
+if [ ! -d "$TDIR" ]; then
+    bail "unable to create temporary directory"
+fi
+
+#
+# extract the zap file
+#
+unzip -q "${ZAPFILE}" -d "$TDIR"
+if [ ! -d "${TDIR}/${PKGNAME}" ]; then
+    bail "unpack failed"
+fi
+if [ ! -f "${TDIR}/${PKGNAME}/pkginfo" ]; then
+    bail "unpack missing pkginfo"
+fi
+if [ ! -f "${TDIR}/${PKGNAME}/pkgmap" ]; then
+    bail "unpack missing pkgmap"
+fi
+
+#
+# now we need to parse the pkgmap file
+#
+cat "${TDIR}/${PKGNAME}/pkgmap" | while read -r part type class name perms user group
+do
+    case $type in
+	i)
+	    $DEBUG "Ignoring metadata $class"
+	    ;;
+	b|c)
+	    $DEBUG "Ignoring device file $name"
+	    ;;
+	e|f|v)
+	    $DEBUG "File $name, perms $perms"
+	    if [ -f "${TDIR}/${PKGNAME}/${RELOC}/$name" ]; then
+		zone_allowed "$name" && handle_file "$name" "$perms" "$user" "$group" "$type" "$class"
+	    fi
+	    ;;
+	d|x)
+	    $DEBUG "Directory $name, perms $perms"
+	    zone_allowed "$name" && handle_dir "$name" "$perms" "$user" "$group"
+	    ;;
+	l)
+	    $DEBUG "Defer hard link $name"
+	    ;;
+	s)
+	    $DEBUG "Soft link $name"
+	    zone_allowed "$name" && handle_softlink "$name"
+	    ;;
+	1)
+	    :
+	    # the pkgmap header, presumably
+	    ;;
+	*)
+	    echo "Unrecognized $part"
+	    ;;
+    esac
+done
+
+#
+# do the hard links in a second pass, to try and guarantee that all the
+# target files exist (won't necessarily work for cross-package hard links)
+#
+cat "${TDIR}/${PKGNAME}/pkgmap" | while read -r part type class name perms user group
+do
+    case $type in
+	l)
+	    $DEBUG "Hard link $name"
+	    zone_allowed "$name" && handle_hardlink "$name"
+	    ;;
+    esac
+done
+
+#
+# clean up
+#
+rm -fr "$TDIR"
+
+#
+# end of loop over zap files
+#
+done

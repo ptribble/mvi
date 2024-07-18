@@ -1,0 +1,381 @@
+#!/bin/ksh
+#
+# SPDX-License-Identifier: CDDL-1.0
+#
+# {{{ CDDL HEADER
+#
+# This file and its contents are supplied under the terms of the
+# Common Development and Distribution License ("CDDL"), version 1.0.
+# You may only use this file in accordance with the terms of version
+# 1.0 of the CDDL.
+#
+# A full copy of the text of the CDDL should have accompanied this
+# source. A copy of the CDDL is also available via the Internet at
+# http://www.illumos.org/license/CDDL.
+#
+# }}}
+#
+# Copyright 2024 Peter Tribble
+#
+
+#
+# This script will take one or more illumos zap files, and construct a
+# modified package that combines the constituent package(s) and applies
+# a set of transforms
+#
+# there are assumptions baked into this about the way that zap files
+# get generated and the default layout they have
+#
+
+THOME=${THOME:-/packages/localsrc/Tribblix}
+
+bail() {
+    echo "ERROR: $1"
+    exit 1
+}
+
+builtin mkdir
+builtin cp
+builtin chmod
+builtin ln
+builtin cat
+
+NEWPKG=""
+DESTDIR=""
+ZAPFILE=""
+RELOC="reloc"
+# filter paths that won't exist in a zone
+ZONED=""
+# filter paths for MVI
+MVI=""
+# true for quiet, echo to see debug
+DEBUG=":"
+
+while getopts "O:R:V:XZ" opt; do
+    case $opt in
+	O)
+	    NEWPKG=${OPTARG}
+	    ;;
+	R)
+	    DESTDIR=${OPTARG}
+	    ;;
+	V)
+	    VERSION=${OPTARG}
+	    ;;
+	X)
+	    MVI="yes"
+	    ;;
+	Z)
+	    ZONED="yes"
+	    ;;
+	*)
+	    bail "invalid option"
+	    ;;
+    esac
+done
+shift $((OPTIND-1))
+
+case $# in
+    0)
+	echo "Usage: $0 [-Z] -O new_pkg -R directory zap_file [zap_file...]"
+	exit 1
+	;;
+esac
+
+#
+# the version is supposed to match the release we source the packages from
+#
+ILDIR="${THOME}/illumos-pkgs-m${VERSION}/pkgs"
+if [ ! -d "${ILDIR}" ]; then
+    bail "cannot find illumos package directory"
+fi
+
+#
+# we use pkg2zap from tribblix-build
+#
+if [ ! -x "${THOME}/tribblix-build/pkg2zap" ]; then
+    bail "cannot find the tribblix-build repo"
+fi
+
+#
+# sanity checks
+#
+if [ -z "${VERSION}" ]; then
+    bail "output version not defined"
+fi
+for INFILE in "$@"
+do
+    ZAPFILE="${ILDIR}/${INFILE}.0.${VERSION}.zap"
+    if [ ! -f "${ZAPFILE}" ]; then
+	bail "source for ${INFILE} not found"
+    fi
+done
+	
+if [ -z "${DESTDIR}" ]; then
+    bail "destination directory not set"
+fi
+if [ -z "${NEWPKG}" ]; then
+    bail "output package not defined"
+fi
+case $DESTDIR in
+    '/')
+	bail "destination directory cannot be /"
+	;;
+    /*)
+	:
+	;;
+    *)
+	bail "must use absolute path to destination"
+	;;
+esac
+
+#
+# filter out pathnames for MVI
+#
+mvi_allowed() {
+    [ -z "${MVI}" ] && return 0
+    case $1 in
+	usr/share/man*|usr/include*)
+	    return 1
+	    ;;
+	etc/svc*|lib/svc*|var/svc*|usr/sadm/install/miniroot.db)
+	    return 1
+	    ;;
+	usr/lib/inet*|usr/lib/libc|usr/lib/libc/*)
+	    return 1
+	    ;;
+	var/spool/cron*|etc/cron.d*|var/cron|usr/xpg*|usr/has*|usr/ccs*)
+	    return 1
+	    ;;
+	etc/mail*|etc/logadm*|var/logadm|etc/ftp*|etc/dhcp*|*ike*|*mail*)
+	    return 1
+	    ;;
+	*spell*|usr/lib/reparse*|usr/lib/pkgconfig*|usr/lib/audit*)
+	    return 1
+	    ;;
+	usr/sbin/snoop|usr/sbin/svccfg|usr/sbin/svcadm|usr/bin/svcs|usr/bin/svcprop)
+	    return 1
+	    ;;
+	*audit*|*stat|usr/sbin/nwam*|lib/inet/nwamd|etc/nwam*|usr/lib/dl|usr/lib/dl/*)
+	    return 1
+	    ;;
+	*flowadm*|*/README|*syslog*|usr/share/lib/tabset*|*/cron*)
+	    return 1
+	    ;;
+	usr/sbin/*share*|etc/security/lib*|*/adt_*|usr/sbin/ipsec*|usr/sbin/keyserv|usr/sbin/zic|usr/sbin/nscd|usr/sbin/format|usr/sbin/rpcbind)
+	    return 1
+	    ;;
+	*pwconv|*inetconv|*pwck|*grpck)
+	    return 1
+	    ;;
+    esac
+    [ -z "${ZONED}" ] && return 0
+    case $1 in
+	usr/lib/raidcfg*|usr/lib/cfgadm*|usr/lib/scsi*|usr/lib/devfsadm*|usr/lib/rcm*|usr/lib/sysevent*)
+	    return 1
+	    ;;
+	usr/lib/class*|usr/lib/pci*|usr/lib/spd*|usr/lib/fs/ufs*|etc/fs/ufs*|usr/sbin/quota*|usr/sbin/ufs*|usr/sbin/tunefs|usr/sbin/newfs|usr/sbin/lockfs|usr/sbin/fsirand|usr/lib/fs/hsfs*|etc/fs/hsfs*)
+	    return 1
+	    ;;
+	lib/mpxio*|usr/sbin/*adm|usr/sbin/installboot|usr/sbin/stmsboot)
+	    return 1
+	    ;;
+    esac
+    return 0
+}
+
+#
+# filter out pathnames that should not exist in a zone
+#
+zone_allowed() {
+    [ -z "${ZONED}" ] && return 0
+    case $1 in
+	kernel*|platform*|usr/kernel*)
+	    return 1
+	    ;;
+    esac
+    return 0
+}
+
+#
+# filter for mvi and zones
+#
+is_allowed() {
+    if zone_allowed "$1"
+    then
+	if mvi_allowed "$1"
+	then
+	    return 0
+	else
+	    return 1
+	fi
+    else
+	return 1
+    fi
+}
+
+#
+# put the objects into the alternate root
+#
+handle_dir() {
+    if [ -d "$DESTDIR/$1" ]; then
+	chmod "$2" "$DESTDIR/$1"
+    else
+	mkdir -p -m "$2" "$DESTDIR/$1"
+    fi
+    echo "d none ${1} ${2} ${3} ${4}" >> "${DESTDIR}/prototype"
+}
+handle_file() {
+    ndir=${1%/*}
+    if [ ! -d "$DESTDIR/${ndir}" ]; then
+	mkdir -p -m 755 "$DESTDIR/${ndir}"
+    fi
+    cp "$TDIR/${PKGNAME}/$RELOC/$1" "$DESTDIR/$1"
+    chmod "$2" "$DESTDIR/$1"
+    echo "${5} ${6} ${1}=${1} ${2} ${3} ${4}" >> "${DESTDIR}/prototype"
+}
+handle_softlink() {
+    lname=${1##*=}
+    rname=${1%%=*}
+    ndir=${rname%/*}
+    if [ ! -d "$DESTDIR/${ndir}" ]; then
+	mkdir -p -m 755 "$DESTDIR/${ndir}"
+    fi
+    ln -s "$lname" "$DESTDIR/$rname"
+    echo "s none ${1}" >> "${DESTDIR}/prototype"
+}
+handle_hardlink() {
+    lname=${1##*=}
+    rname=${1%%=*}
+    ndir=${rname%/*}
+    if [ ! -d "$DESTDIR/${ndir}" ]; then
+	mkdir -p -m 755 "$DESTDIR/${ndir}"
+    fi
+    # the hardlink target must be relative to the source name
+    ln "$DESTDIR/${ndir}/$lname" "$DESTDIR/$rname"
+    echo "l none ${1}" >> "${DESTDIR}/prototype"
+}
+
+#
+# we also populate a prototype file
+#
+mkdir -p -m 755 "${DESTDIR}"
+touch "${DESTDIR}/prototype"
+
+#
+# now loop over all the input zap files
+#
+for INFILE in "$@"
+do
+    ZAPFILE="${ILDIR}/${INFILE}.0.${VERSION}.zap"
+    PKGNAME=${ZAPFILE##*/}
+    PKGNAME=${PKGNAME%%.*}
+
+VISH=$(digest -a md5 "${ZAPFILE}")
+TDIR=/tmp/zapadd.${VISH}.$$
+rm -fr "$TDIR"
+mkdir -p "$TDIR"
+if [ ! -d "$TDIR" ]; then
+    bail "unable to create temporary directory"
+fi
+
+#
+# extract the zap file
+#
+unzip -q "${ZAPFILE}" -d "$TDIR"
+if [ ! -d "${TDIR}/${PKGNAME}" ]; then
+    bail "unpack failed"
+fi
+if [ ! -f "${TDIR}/${PKGNAME}/pkginfo" ]; then
+    bail "unpack missing pkginfo"
+fi
+if [ ! -f "${TDIR}/${PKGNAME}/pkgmap" ]; then
+    bail "unpack missing pkgmap"
+fi
+
+#
+# now we need to parse the pkgmap file
+#
+cat "${TDIR}/${PKGNAME}/pkgmap" | while read -r part type class name perms user group
+do
+    case $type in
+	i)
+	    $DEBUG "Ignoring metadata $class"
+	    ;;
+	b|c)
+	    $DEBUG "Ignoring device file $name"
+	    ;;
+	e|f|v)
+	    $DEBUG "File $name, perms $perms"
+	    if [ -f "${TDIR}/${PKGNAME}/${RELOC}/$name" ]; then
+		is_allowed "$name" && handle_file "$name" "$perms" "$user" "$group" "$type" "$class"
+	    fi
+	    ;;
+	d|x)
+	    $DEBUG "Directory $name, perms $perms"
+	    is_allowed "$name" && handle_dir "$name" "$perms" "$user" "$group"
+	    ;;
+	l)
+	    $DEBUG "Defer hard link $name"
+	    ;;
+	s)
+	    $DEBUG "Soft link $name"
+	    is_allowed "$name" && handle_softlink "$name"
+	    ;;
+	1)
+	    :
+	    # the pkgmap header, presumably
+	    ;;
+	*)
+	    echo "Unrecognized $part"
+	    ;;
+    esac
+done
+
+#
+# do the hard links in a second pass, to try and guarantee that all the
+# target files exist (won't necessarily work for cross-package hard links)
+#
+cat "${TDIR}/${PKGNAME}/pkgmap" | while read -r part type class name perms user group
+do
+    case $type in
+	l)
+	    $DEBUG "Hard link $name"
+	    is_allowed "$name" && handle_hardlink "$name"
+	    ;;
+    esac
+done
+
+#
+# clean up
+#
+rm -fr "$TDIR"
+
+#
+# end of loop over zap files
+#
+done
+
+#
+# now we need to create a pkginfo file
+#
+ARCH=$(uname -p)
+touch "${DESTDIR}/pkginfo"
+echo "PKG=\"${NEWPKG}\"" >> "${DESTDIR}/pkginfo"
+echo "NAME=\"${NEWPKG}\"" >> "${DESTDIR}/pkginfo"
+echo "ARCH=\"${ARCH}\"" >> "${DESTDIR}/pkginfo"
+echo "VERSION=\"${VERSION}\"" >> "${DESTDIR}/pkginfo"
+echo "CATEGORY=\"system\"" >> "${DESTDIR}/pkginfo"
+echo "VENDOR=\"Tribblix\"" >> "${DESTDIR}/pkginfo"
+echo "BASEDIR=\"/\"" >> "${DESTDIR}/pkginfo"
+echo "PSTAMP=\"tribblix\"" >> "${DESTDIR}/pkginfo"
+
+#
+# and create the package
+#
+cd "$DESTDIR" || bail "Unable to cd to $DESTDIR"
+echo "i pkginfo=./pkginfo" >> prototype
+mkdir -p /tmp/pkgs
+/usr/bin/pkgmk -d /tmp/pkgs -f prototype -r $(pwd) "${NEWPKG}"
+/usr/bin/pkgtrans -s /tmp/pkgs /tmp/pkgs/"${NEWPKG}.0.${VERSION}.pkg" "${NEWPKG}"
+${THOME}/tribblix-build/pkg2zap /tmp/pkgs/"${NEWPKG}.0.${VERSION}.pkg" /tmp/pkgs
