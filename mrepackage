@@ -150,7 +150,7 @@ mvi_allowed() {
 	etc/mail*|etc/logadm*|var/logadm|etc/ftp*|etc/dhcp*|*ike*|*mail*)
 	    return 1
 	    ;;
-	*spell*|usr/lib/reparse*|usr/lib/pkgconfig*|usr/lib/audit*)
+	*spell*|usr/lib/reparse*|usr/lib/pkgconfig*|usr/lib/*/pkgconfig*|usr/lib/audit*)
 	    return 1
 	    ;;
 	usr/sbin/snoop|usr/sbin/svccfg|usr/sbin/svcadm|usr/bin/svcs|usr/bin/svcprop)
@@ -159,7 +159,7 @@ mvi_allowed() {
 	*audit*|*stat|usr/sbin/nwam*|lib/inet/nwamd|etc/nwam*|usr/lib/dl|usr/lib/dl/*)
 	    return 1
 	    ;;
-	*flowadm*|*/README|*syslog*|usr/share/lib/tabset*|*/cron*)
+	*flowadm*|*/README|*syslog*|usr/share/lib/tabset*|*/cron*|usr/lib/makekey)
 	    return 1
 	    ;;
 	usr/sbin/*share*|etc/security/lib*|*/adt_*|usr/sbin/ipsec*|usr/sbin/keyserv|usr/sbin/zic|usr/sbin/nscd|usr/sbin/format|usr/sbin/rpcbind)
@@ -168,16 +168,25 @@ mvi_allowed() {
 	*pwconv|*inetconv|*pwck|*grpck)
 	    return 1
 	    ;;
+	etc/versions*|*/crle|*/moe|*/finger|*/whois|*/tip|usr/lib/expreserve|usr/lib/exrecover)
+	    return 1
+	    ;;
     esac
     [ -z "${ZONED}" ] && return 0
     case $1 in
-	usr/lib/raidcfg*|usr/lib/cfgadm*|usr/lib/scsi*|usr/lib/devfsadm*|usr/lib/rcm*|usr/lib/sysevent*)
+	usr/lib/raidcfg*|usr/lib/cfgadm*|usr/lib/scsi*|usr/lib/devfsadm*|usr/lib/rcm*|usr/lib/sysevent*|usr/sbin/smbios|usr/sbin/*_drv)
 	    return 1
 	    ;;
 	usr/lib/class*|usr/lib/pci*|usr/lib/spd*|usr/lib/fs/ufs*|etc/fs/ufs*|usr/sbin/quota*|usr/sbin/ufs*|usr/sbin/tunefs|usr/sbin/newfs|usr/sbin/lockfs|usr/sbin/fsirand|usr/lib/fs/hsfs*|etc/fs/hsfs*)
 	    return 1
 	    ;;
-	lib/mpxio*|usr/sbin/*adm|usr/sbin/installboot|usr/sbin/stmsboot)
+	lib/mpxio*|usr/sbin/*adm|usr/sbin/installboot|usr/sbin/stmsboot|usr/sbin/ndd)
+	    return 1
+	    ;;
+	*/eject|*/fdformat|*/tic|*/tput|*/dumpkeys|*/loadkeys|*/captoinfo|*/infocmp|*/dumpcs|usr/bin/strchg|usr/bin/strconf|usr/bin/fdetach|*/coreadm|*/keylog*)
+	    return 1
+	    ;;
+	usr/lib/intrd|usr/lib/hotplugd)
 	    return 1
 	    ;;
     esac
