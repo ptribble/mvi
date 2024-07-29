@@ -20,8 +20,8 @@
 
 #
 # This script will take one or more illumos zap files, and construct a
-# modified package that combines the constituent package(s) and applies
-# a set of transforms
+# new package that combines the constituent package(s) and applies
+# a fixed set of transforms
 #
 # there are assumptions baked into this about the way that zap files
 # get generated and the default layout they have
@@ -38,26 +38,26 @@ builtin mkdir
 builtin cp
 builtin chmod
 builtin ln
-builtin cat
 
 NEWPKG=""
-DESTDIR=""
 ZAPFILE=""
+# content in zap files comes under reloc
 RELOC="reloc"
-# filter paths that won't exist in a zone
+# filter paths that won't exist in a zone, enable with -Z
 ZONED=""
-# filter paths for MVI
+# filter paths for MVI, enable with -X
 MVI=""
 # true for quiet, echo to see debug
 DEBUG=":"
+# where output files end up
+OUTDIR="/tmp/pkgs"
+# temporary installation (working) directory
+DESTDIR="/tmp/repack.$$.$(date '+%s')"
 
-while getopts "O:R:V:XZ" opt; do
+while getopts "O:V:XZ" opt; do
     case $opt in
 	O)
 	    NEWPKG=${OPTARG}
-	    ;;
-	R)
-	    DESTDIR=${OPTARG}
 	    ;;
 	V)
 	    VERSION=${OPTARG}
@@ -77,7 +77,7 @@ shift $((OPTIND-1))
 
 case $# in
     0)
-	echo "Usage: $0 [-Z] -O new_pkg -R directory zap_file [zap_file...]"
+	echo "Usage: $0 [-X] [-Z] -V version -O new_pkg pkg [pkg...]"
 	exit 1
 	;;
 esac
@@ -128,6 +128,12 @@ case $DESTDIR in
 	bail "must use absolute path to destination"
 	;;
 esac
+#
+# output package name mustn't be the same as an existing package
+#
+if [ -f "${ILDIR}/${NEWPKG}.0.${VERSION}.zap" ]; then
+    bail "name $NEWPKG is already in use"
+fi
 
 #
 # filter out pathnames for MVI
@@ -141,10 +147,10 @@ mvi_allowed() {
 	etc/svc*|lib/svc*|var/svc*|usr/sadm/install/miniroot.db)
 	    return 1
 	    ;;
-	usr/lib/inet*|usr/lib/libc|usr/lib/libc/*)
+	usr/lib/inet*|usr/lib/libc|usr/lib/libc/*|usr/lib/lib.b|*/sbin/inetd*)
 	    return 1
 	    ;;
-	var/spool/cron*|etc/cron.d*|var/cron|usr/xpg*|usr/has*|usr/ccs*)
+	var/spool/cron*|etc/cron.d*|var/cron|usr/bin/at*|usr/xpg*|usr/has*|usr/ccs*)
 	    return 1
 	    ;;
 	etc/mail*|etc/logadm*|var/logadm|etc/ftp*|etc/dhcp*|*ike*|*mail*)
@@ -165,7 +171,7 @@ mvi_allowed() {
 	usr/sbin/*share*|etc/security/lib*|*/adt_*|usr/sbin/ipsec*|usr/sbin/keyserv|usr/sbin/zic|usr/sbin/nscd|usr/sbin/format|usr/sbin/rpcbind)
 	    return 1
 	    ;;
-	*pwconv|*inetconv|*pwck|*grpck)
+	*pwconv|*inetconv|*pwck|*grpck|*/whodo|*/csh*)
 	    return 1
 	    ;;
 	etc/versions*|*/crle|*/moe|*/finger|*/whois|*/tip|usr/lib/expreserve|usr/lib/exrecover)
@@ -174,19 +180,19 @@ mvi_allowed() {
     esac
     [ -z "${ZONED}" ] && return 0
     case $1 in
-	usr/lib/raidcfg*|usr/lib/cfgadm*|usr/lib/scsi*|usr/lib/devfsadm*|usr/lib/rcm*|usr/lib/sysevent*|usr/sbin/smbios|usr/sbin/*_drv)
+	usr/lib/raidcfg*|usr/sbin/raidctl|usr/lib/cfgadm*|usr/lib/scsi*|usr/lib/devfsadm*|usr/lib/rcm*|usr/lib/sysevent*|usr/sbin/smbios|usr/sbin/*_drv)
 	    return 1
 	    ;;
-	usr/lib/class*|usr/lib/pci*|usr/lib/spd*|usr/lib/fs/ufs*|etc/fs/ufs*|usr/sbin/quota*|usr/sbin/ufs*|usr/sbin/tunefs|usr/sbin/newfs|usr/sbin/lockfs|usr/sbin/fsirand|usr/lib/fs/hsfs*|etc/fs/hsfs*)
+	usr/lib/class*|usr/lib/pci*|usr/lib/spd*|usr/lib/fs/ufs*|*/fsirand|*/tunefs|*/lockfs|*/newfs|etc/fs/ufs*|usr/sbin/quota*|usr/sbin/ufs*|usr/sbin/tunefs|usr/sbin/newfs|usr/sbin/growfs|usr/sbin/clri|*/mkfs*|*/labelit*|*/dcopy*|*/fssnap*|*/fsdb*|usr/sbin/fmthard|usr/sbin/prtvtoc|usr/sbin/fsck|usr/sbin/lockfs|usr/sbin/fsirand|usr/lib/fs/hsfs*|etc/fs/hsfs*)
 	    return 1
 	    ;;
-	lib/mpxio*|usr/sbin/*adm|usr/sbin/installboot|usr/sbin/stmsboot|usr/sbin/ndd)
+	lib/mpxio*|usr/sbin/*adm|usr/sbin/installboot|usr/sbin/stmsboot|usr/sbin/ndd|usr/sbin/rtc|usr/sbin/hotplug|usr/sbin/mod*load|usr/sbin/locator)
 	    return 1
 	    ;;
-	*/eject|*/fdformat|*/tic|*/tput|*/dumpkeys|*/loadkeys|*/captoinfo|*/infocmp|*/dumpcs|usr/bin/strchg|usr/bin/strconf|usr/bin/fdetach|*/coreadm|*/keylog*)
+	*/eject|*/fdformat|*/tic|*/tput|*/dumpkeys|*/loadkeys|*/captoinfo|*/infocmp|*/dumpcs|*/zdump|usr/bin/strchg|usr/bin/strconf|usr/bin/fdetach|*/coreadm|*/keylog*)
 	    return 1
 	    ;;
-	usr/lib/intrd|usr/lib/hotplugd)
+	usr/lib/intrd|usr/lib/hotplugd|*/fdisk|*/fiocompress|*sbin/swap*|*/root_archive|*/dispadmin|usr/sbin/sysdef|usr/sbin/prtdiag|usr/sbin/eeprom)
 	    return 1
 	    ;;
     esac
@@ -293,19 +299,19 @@ fi
 #
 unzip -q "${ZAPFILE}" -d "$TDIR"
 if [ ! -d "${TDIR}/${PKGNAME}" ]; then
-    bail "unpack failed"
+    bail "unpack of ${INFILE} failed"
 fi
 if [ ! -f "${TDIR}/${PKGNAME}/pkginfo" ]; then
-    bail "unpack missing pkginfo"
+    bail "unpack of ${INFILE} missing pkginfo"
 fi
 if [ ! -f "${TDIR}/${PKGNAME}/pkgmap" ]; then
-    bail "unpack missing pkgmap"
+    bail "unpack of ${INFILE} missing pkgmap"
 fi
 
 #
 # now we need to parse the pkgmap file
 #
-cat "${TDIR}/${PKGNAME}/pkgmap" | while read -r part type class name perms user group
+while read -r part type class name perms user group
 do
     case $type in
 	i)
@@ -339,13 +345,13 @@ do
 	    echo "Unrecognized $part"
 	    ;;
     esac
-done
+done < "${TDIR}/${PKGNAME}/pkgmap"
 
 #
 # do the hard links in a second pass, to try and guarantee that all the
 # target files exist (won't necessarily work for cross-package hard links)
 #
-cat "${TDIR}/${PKGNAME}/pkgmap" | while read -r part type class name perms user group
+while read -r part type class name perms user group
 do
     case $type in
 	l)
@@ -353,7 +359,7 @@ do
 	    is_allowed "$name" && handle_hardlink "$name"
 	    ;;
     esac
-done
+done < "${TDIR}/${PKGNAME}/pkgmap"
 
 #
 # clean up
@@ -384,7 +390,13 @@ echo "PSTAMP=\"tribblix\"" >> "${DESTDIR}/pkginfo"
 #
 cd "$DESTDIR" || bail "Unable to cd to $DESTDIR"
 echo "i pkginfo=./pkginfo" >> prototype
-mkdir -p /tmp/pkgs
-/usr/bin/pkgmk -d /tmp/pkgs -f prototype -r $(pwd) "${NEWPKG}"
-/usr/bin/pkgtrans -s /tmp/pkgs /tmp/pkgs/"${NEWPKG}.0.${VERSION}.pkg" "${NEWPKG}"
-${THOME}/tribblix-build/pkg2zap /tmp/pkgs/"${NEWPKG}.0.${VERSION}.pkg" /tmp/pkgs
+mkdir -p "${OUTDIR}"
+/usr/bin/pkgmk -d "${OUTDIR}" -f prototype -r $(pwd) "${NEWPKG}"
+/usr/bin/pkgtrans -s "${OUTDIR}" "${OUTDIR}"/"${NEWPKG}.0.${VERSION}.pkg" "${NEWPKG}"
+"${THOME}"/tribblix-build/pkg2zap "${OUTDIR}"/"${NEWPKG}.0.${VERSION}.pkg" "${OUTDIR}"
+
+#
+# clean up
+#
+cd /
+rm -fr "$DESTDIR"
