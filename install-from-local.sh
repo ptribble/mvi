@@ -66,8 +66,8 @@ mkdir -p "${DESTDIR}"
 for pkg in $(<"${PKGLIST}")
 do
     if [ -f "${PROTO_DIR}/pkgs/${pkg}.${ILVER}.zap" ]; then
-	$INSTZAP -R "$DESTDIR" "${PROTO_DIR}/pkgs/${pkg}.${ILVER}.zap" $(echo "$pkg" | awk -F. '{print $1}')
+	$INSTZAP -R "$DESTDIR" "${PROTO_DIR}/pkgs/${pkg}.${ILVER}.zap"
     else
-	$INSTZAP -R "$DESTDIR" "${THOME}/pkgs/${pkg}.zap" $(echo "$pkg" | awk -F. '{print $1}')
+	$INSTZAP -R "$DESTDIR" "${THOME}/pkgs/${pkg}.zap"
     fi
 done
