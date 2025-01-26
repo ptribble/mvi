@@ -32,7 +32,6 @@
 # -A - wipe all drives
 # -B - fdisk the drives, so we overwrite the whole drive; by default
 #    we just purge the Solaris partition
-# -C - number of times to run the wipe [unimplemented]
 # -D - switch defect lists (not valid for all drives)
 # * - a list of drives to wipe
 #
@@ -45,18 +44,19 @@
 WIPEALL=""
 BFLAG=""
 DEFECT=""
-COUNT=1
 
-while getopts "ABC:D" opt; do
+bail() {
+    echo "ERROR: $1"
+    exit 1
+}
+
+while getopts "ABD" opt; do
 case $opt in
 A)
   WIPEALL="y"
   ;;
 B)
   BFLAG="-B"
-  ;;
-C)
-  COUNT="$OPTARG"
   ;;
 D)
   DEFECT="y"
@@ -70,12 +70,10 @@ shift $((OPTIND - 1))
 # must give a list or -A
 #
 if [[ -n "$WIPEALL" && $# -gt 0 ]]; then
-    echo "Cannot specify -A with disk names"
-    exit 1
+    bail "Cannot specify -A with disk names"
 fi
 if [[ -z "$WIPEALL" && $# -le 0 ]]; then
-    echo "Must specify -A or provide a list of disks"
-    exit 1
+    bail "Must specify -A or provide a list of disks"
 fi
 
 #
@@ -85,7 +83,7 @@ fi
 #
 DLIST=""
 if [[ -n "$WIPEALL" ]]; then
-    cd /dev/dsk || exit 1
+    cd /dev/dsk || bail "cannot cd"
     for drive in c*s2
     do
 	if [ ! -h "/dev/removable-media/dsk/$drive" ]; then
@@ -94,14 +92,13 @@ if [[ -n "$WIPEALL" ]]; then
 	fi
     done
     if [[ -z "$DLIST" ]]; then
-	echo "No drives detected"
-	exit 1
+	bail "No drives detected"
     else
 	echo "Drive list is"
 	echo "$DLIST"
     fi
 else
-    cd /dev/dsk || exit 1
+    cd /dev/dsk || bail "cannot cd"
     for drive in "$@"
     do
 	#
@@ -128,8 +125,7 @@ else
 	fi
     done
     if [[ -z "$DLIST" ]]; then
-	echo "No valid drives detected"
-	exit 1
+	bail "No valid drives detected"
     else
 	echo "Drive list is"
 	echo "$DLIST"
@@ -173,16 +169,11 @@ if [[ -n $BFLAG ]]; then
   done
 fi
 #
-# while [[ $COUNT -gt 0 ]]
-# do
 for disk in $DLIST
 do
     format -f $FFILE -l /tmp/disk_wipe."${disk}".log "$disk" > /dev/null 2>&1 &
     echo "log output is in /tmp/disk_wipe.${disk}.log"
 done
-# COUNT=$((COUNT-1))
-# done
-#
 
 #
 # clean up

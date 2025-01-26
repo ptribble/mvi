@@ -31,7 +31,7 @@ case $# in
 	;;
     *)
 	echo "Usage: $0 version dest_dir pkg_list"
-	exit 1
+	exit 2
 	;;
 esac
 

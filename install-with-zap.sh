@@ -15,13 +15,14 @@
 #
 # }}}
 #
-# Copyright 2024 Peter Tribble
+# Copyright 2025 Peter Tribble
 #
 
 #
 # install packages using zap
 #
-# the version is ignored, we inherit from the current system
+# the version is ignored, we inherit from the current system, but all the
+# install options are called with the same arguments
 #
 case $# in
     3)
@@ -30,8 +31,8 @@ case $# in
 	PKGLIST=$3
 	;;
     *)
-	echo "Usage: $0 dest_dir pkg_list"
-	exit 1
+	echo "Usage: $0 version dest_dir pkg_list"
+	exit 2
 	;;
 esac
 
