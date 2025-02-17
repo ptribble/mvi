@@ -141,7 +141,7 @@ fi
 mvi_allowed() {
     [ -z "${MVI}" ] && return 0
     case $1 in
-	usr/share/man*|usr/include*)
+	usr/share/man*|usr/include*|var/sadm/license*)
 	    return 1
 	    ;;
 	etc/svc*|lib/svc*|var/svc*|usr/sadm/install/miniroot.db)
