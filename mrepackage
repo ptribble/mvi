@@ -162,16 +162,16 @@ mvi_allowed() {
 	usr/sbin/snoop|usr/sbin/svccfg|usr/sbin/svcadm|usr/bin/svcs|usr/bin/svcprop)
 	    return 1
 	    ;;
-	*audit*|*stat|usr/sbin/nwam*|lib/inet/nwamd|etc/nwam*|usr/lib/dl|usr/lib/dl/*)
+	*audit*|*stat|usr/sbin/nwam*|lib/inet/nwamd|etc/nwam*|usr/lib/dl|usr/lib/dl/*|usr/sbin/idmap|usr/lib/idmapd|usr/sbin/nltest)
 	    return 1
 	    ;;
 	*flowadm*|*/README|*syslog*|usr/share/lib/tabset*|*/cron*|usr/lib/makekey)
 	    return 1
 	    ;;
-	usr/sbin/*share*|etc/security/lib*|*/adt_*|usr/sbin/ipsec*|usr/sbin/tcpkey|usr/sbin/keyserv|usr/sbin/zic|usr/sbin/nscd|usr/sbin/format|usr/sbin/rpcbind)
+	usr/sbin/*share*|etc/security/lib*|*/adt_*|usr/sbin/ipsec*|usr/sbin/tcpkey*|usr/sbin/keyserv|usr/sbin/zic|usr/sbin/nscd|usr/sbin/format|usr/sbin/rpcbind)
 	    return 1
 	    ;;
-	*pwconv|*inetconv|*pwck|*grpck|*/whodo|*/csh*)
+	*pwconv|*inetconv|*pwck|*grpck|*/whodo|*/csh*|usr/bin/amd64*|usr/bin/sparcv9*|usr/lib/isaexec)
 	    return 1
 	    ;;
 	etc/versions*|*/crle|*/moe|*/finger|*/whois|*/tip|usr/lib/expreserve|usr/lib/exrecover)
@@ -189,7 +189,7 @@ mvi_allowed() {
 	lib/mpxio*|usr/sbin/*adm|usr/sbin/installboot|usr/sbin/stmsboot|usr/sbin/ndd|usr/sbin/rtc|usr/sbin/hotplug|usr/sbin/mod*load|usr/sbin/locator)
 	    return 1
 	    ;;
-	*/eject|*/fdformat|*/tic|*/tput|*/dumpkeys|*/loadkeys|*/captoinfo|*/infocmp|*/dumpcs|*/zdump|usr/bin/strchg|usr/bin/strconf|usr/bin/fdetach|*/coreadm|*/keylog*)
+	*/eject|*/fdformat|*/tic|*/tput|*/dumpkeys|*/loadkeys|*/captoinfo|*/infocmp|*/dumpcs|*/zdump|usr/bin/strchg|usr/bin/strconf|usr/bin/fdetach|*/coreadm|*/keylog*|etc/sysevent*)
 	    return 1
 	    ;;
 	usr/lib/intrd|usr/lib/hotplugd|*/fdisk|*/fiocompress|*sbin/swap*|*/root_archive|*/dispadmin|usr/sbin/sysdef|usr/sbin/prtdiag|usr/sbin/eeprom)
@@ -310,8 +310,11 @@ fi
 
 #
 # now we need to parse the pkgmap file
+# the read will assign any additional fields to the last variable,
+# so add an extra parameter rest to soak those up rather than group
+# acquiring extra junk
 #
-while read -r part type class name perms user group
+while read -r part type class name perms user group rest
 do
     case $type in
 	i)
@@ -370,6 +373,14 @@ rm -fr "$TDIR"
 # end of loop over zap files
 #
 done
+
+#
+# the default /etc/passwd sets bash as the shell for root, but bash
+# isn't included in the mvi environment so change to a shell that exists
+#
+if [ -f ${DESTDIR}/etc/passwd ]; then
+    sed -i s:/usr/bin/bash:/bin/ksh: ${DESTDIR}/etc/passwd
+fi
 
 #
 # now we need to create a pkginfo file
