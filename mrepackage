@@ -168,7 +168,7 @@ mvi_allowed() {
 	*flowadm*|*/README|*syslog*|usr/share/lib/tabset*|*/cron*|usr/lib/makekey)
 	    return 1
 	    ;;
-	usr/sbin/*share*|etc/security/lib*|*/adt_*|usr/sbin/ipsec*|usr/sbin/keyserv|usr/sbin/zic|usr/sbin/nscd|usr/sbin/format|usr/sbin/rpcbind)
+	usr/sbin/*share*|etc/security/lib*|*/adt_*|usr/sbin/ipsec*|usr/sbin/tcpkey|usr/sbin/keyserv|usr/sbin/zic|usr/sbin/nscd|usr/sbin/format|usr/sbin/rpcbind)
 	    return 1
 	    ;;
 	*pwconv|*inetconv|*pwck|*grpck|*/whodo|*/csh*)
