@@ -15,7 +15,7 @@
 #
 # }}}
 #
-# Copyright 2024 Peter Tribble
+# Copyright 2025 Peter Tribble
 #
 
 #
@@ -32,7 +32,7 @@ ISO_NAME=/var/tmp/zmvi.tar.gz
 # Tribblix version for illumos pkgs
 # override with -v
 #
-DISTVER=35
+DISTVER=36
 
 bail(){
     echo "ERROR: $1"
