@@ -15,7 +15,7 @@
 #
 # }}}
 #
-# Copyright 2024 Peter Tribble
+# Copyright 2025 Peter Tribble
 #
 
 #
@@ -53,11 +53,18 @@ DEBUG=":"
 OUTDIR="/tmp/pkgs"
 # temporary installation (working) directory
 DESTDIR="/tmp/repack.$$.$(date '+%s')"
+# architecture suffix, this is set with the -P flag, eg "-P sparc"
+MYARCH=""
+MYARCHSUFFIX=""
 
-while getopts "O:V:XZ" opt; do
+while getopts "O:P:V:XZ" opt; do
     case $opt in
 	O)
 	    NEWPKG=${OPTARG}
+	    ;;
+	P)
+	    MYARCH="${OPTARG}"
+	    MYARCHSUFFIX=".${OPTARG}"
 	    ;;
 	V)
 	    VERSION=${OPTARG}
@@ -85,7 +92,7 @@ esac
 #
 # the version is supposed to match the release we source the packages from
 #
-ILDIR="${THOME}/illumos-pkgs-m${VERSION}/pkgs"
+ILDIR="${THOME}/illumos-pkgs-m${VERSION}${MYARCHSUFFIX}/pkgs"
 if [ ! -d "${ILDIR}" ]; then
     bail "cannot find illumos package directory"
 fi
@@ -171,8 +178,15 @@ mvi_allowed() {
 	usr/sbin/*share*|etc/security/lib*|*/adt_*|usr/sbin/ipsec*|usr/sbin/tcpkey*|usr/sbin/keyserv|usr/sbin/zic|usr/sbin/nscd|usr/sbin/format|usr/sbin/rpcbind)
 	    return 1
 	    ;;
-	*pwconv|*inetconv|*pwck|*grpck|*/whodo|*/csh*|usr/bin/amd64*|usr/bin/sparcv9*|usr/lib/isaexec)
+	*pwconv|*inetconv|*pwck|*grpck|*/whodo|*/csh*|usr/bin/rksh*|usr/bin/pfrksh*|usr/bin/amd64*|usr/bin/sparcv9*)
 	    return 1
+	    ;;
+	usr/lib/isaexec)
+	    if [ -z "${MYARCH}" ]; then
+		return 1
+	    else
+		return 0
+	    fi
 	    ;;
 	etc/versions*|*/crle|*/moe|*/finger|*/whois|*/tip|usr/lib/expreserve|usr/lib/exrecover)
 	    return 1
