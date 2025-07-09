@@ -4,7 +4,7 @@ MVI - Minimal Viable Illumos
 These are some scripts I've used to build a minimal illumos image
 capable of running a single application.
 
-The scripts, particularly the paths embedded in them, are specific
+The scripts, particularly the paths embedded in them, are fairly specific
 to Tribblix and my own build environment.
 
 The master scripts are mvi.sh and mvix.sh, which take opposing approaches
@@ -37,6 +37,9 @@ For any argument foo, there may be some files:
 The intention here is that the system will often be booted under a hypervisor,
 allowing most of the drivers and support files to be eliminated by default. I
 have tested qemu and VirtualBox.
+
+There's also a modernized copy of pureboot.sh, which is aimed at turning the
+proto area from a gate build into a basic bootable iso.
 
 
 As an example:
