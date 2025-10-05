@@ -15,7 +15,7 @@
 #
 # }}}
 #
-# Copyright 2024 Peter Tribble
+# Copyright 2025 Peter Tribble
 #
 
 cp "${THOME}/mvi/disk_wipe.sh" wipe.sh
@@ -233,7 +233,5 @@ rm -fr boot/acpi
 rm -f boot/solaris/filelist*
 rm -fr boot/solaris/bin
 
-#
-# 
 #
 export MRSIZE=44M

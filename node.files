@@ -16,4 +16,4 @@ usr/lib/amd64/libstdc++.so.6
 usr/lib/amd64/libstdc++.so.6.0.28
 usr/lib/amd64/libgcc_s.so.1
 lib/amd64/libpthread.so.1
-usr/versions/node-v18/bin/node 
+usr/versions/node-v18/bin/node
