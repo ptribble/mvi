@@ -32,7 +32,7 @@ ISO_NAME=/var/tmp/zmvi.tar.gz
 # Tribblix version for illumos pkgs
 # override with -v
 #
-DISTVER=36
+DISTVER=37
 
 bail(){
     echo "ERROR: $1"
