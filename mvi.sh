@@ -32,7 +32,7 @@ ISO_NAME=/tmp/mvi.iso
 # Tribblix version for illumos pkgs
 # override with -v
 #
-DISTVER=37
+DISTVER=38
 
 bail(){
     echo "ERROR: $1"
