@@ -15,7 +15,7 @@
 #
 # }}}
 #
-# Copyright 2024 Peter Tribble
+# Copyright 2026 Peter Tribble
 #
 
 #
@@ -23,14 +23,14 @@
 #
 
 #
-# where the output should end up
-#
-ISO_NAME=/var/tmp/sysroot.tar.gz
-
-#
 # Tribblix version for illumos pkgs
 #
-DISTVER=20.6
+DISTVER=38
+
+#
+# where the output should end up
+#
+ISO_NAME=/var/tmp/sysroot.${DISTVER}.tar.gz
 
 #
 # *** CUSTOMIZE ***
@@ -63,7 +63,7 @@ PKG_LIST="sysroot"
 # argument processing
 #
 INSTALL_PKGS=${MVI_DIR}/install-from-local.sh
-while getopts "frso:p:v:" opt; do
+while getopts "frso:p:uv:" opt; do
     case $opt in
 	f)
 	    # install from file system
@@ -91,10 +91,15 @@ while getopts "frso:p:v:" opt; do
 	    # name of file containing pkg list
 	    PKG_LIST="$OPTARG"
 	    ;;
+	u)
+	    # user install, using zapadd
+	    INSTALL_PKGS=${MVI_DIR}/mzapadd
+	    ;;
 	v)
 	    # tribblix version
 	    DISTVER="$OPTARG"
 	    PROTO_DIR=${THOME}/illumos-pkgs-m${DISTVER}
+	    ISO_NAME=/var/tmp/sysroot.${DISTVER}.tar.gz
 	    ;;
 	*)
 	    exit 1
@@ -134,6 +139,10 @@ if [ ! -f "${MVI_DIR}/${PKG_LIST}.pkgs" ]; then
     echo "ERROR: unable to find package list ${MVI_DIR}/${PKG_LIST}.pkgs"
     exit 1
 fi
+if [ ! -d "$PROTO_DIR" ]; then
+    echo "ERROR: unable to find packages for release ${DISTVER}"
+    exit 1
+fi
 
 #
 # clean up and populate
@@ -153,6 +162,7 @@ rm -fr usr/share \
    usr/ccs \
    sbin \
    bin
+rm -f prototype
 
 cd ${DESTDIR} || exit
 tar cfz "$ISO_NAME" *

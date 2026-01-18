@@ -1,0 +1,61 @@
+#!/bin/ksh
+#
+# SPDX-License-Identifier: CDDL-1.0
+#
+# {{{ CDDL HEADER
+#
+# This file and its contents are supplied under the terms of the
+# Common Development and Distribution License ("CDDL"), version 1.0.
+# You may only use this file in accordance with the terms of version
+# 1.0 of the CDDL.
+#
+# A full copy of the text of the CDDL should have accompanied this
+# source. A copy of the CDDL is also available via the Internet at
+# http://www.illumos.org/license/CDDL.
+#
+# }}}
+#
+# Copyright 2026 Peter Tribble
+#
+
+#
+# this is a wrapper around zapadd that can be called from sysroot.sh
+#
+case $# in
+    3)
+	DISTVER=$1
+	DESTDIR=$2
+	PKGLIST=$3
+	;;
+    *)
+	echo "Usage: $0 version dest_dir pkg_list"
+	exit 2
+	;;
+esac
+
+THOME=${THOME:-/packages/localsrc/Tribblix}
+export THOME
+MVI_DIR=${THOME}/mvi
+PROTO_DIR=${THOME}/illumos-pkgs-m${DISTVER}
+
+if [ ! -x "${MVI_DIR}/zapadd" ]; then
+    echo "ERROR: unable to find zapadd"
+    exit 1
+fi
+if [ ! -f "${PKGLIST}" ]; then
+    echo "ERROR: unable to find package list"
+    exit 1
+fi
+mkdir -p "${DESTDIR}"
+for pkg in $(<"${PKGLIST}")
+do
+    npkg=$(echo "$pkg" | awk -F. '{print $1}')
+    if [ -f "${PROTO_DIR}/pkgs/${npkg}.0.${DISTVER}.zap" ]; then
+	xpkg="${PROTO_DIR}/pkgs/${npkg}.0.${DISTVER}.zap"
+    elif [ -f "${THOME}/pkgs/${pkg}.zap" ]; then
+	xpkg="${THOME}/pkgs/${pkg}.zap"
+    else
+	xpkg="/dev/null"
+    fi
+    "${MVI_DIR}/zapadd" -R "$DESTDIR" "$xpkg"
+done
