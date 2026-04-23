@@ -15,7 +15,7 @@
 #
 # }}}
 #
-# Copyright 2025 Peter Tribble
+# Copyright 2026 Peter Tribble
 #
 
 #
@@ -32,7 +32,7 @@ ISO_NAME=/var/tmp/mvi.iso
 # Tribblix version for illumos pkgs
 # override with -v
 #
-DISTVER=38
+DISTVER=39
 
 bail(){
     echo "ERROR: $1"

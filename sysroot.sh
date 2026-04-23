@@ -25,7 +25,7 @@
 #
 # Tribblix version for illumos pkgs
 #
-DISTVER=38
+DISTVER=39
 
 #
 # where the output should end up

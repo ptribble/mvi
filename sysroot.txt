@@ -14,7 +14,7 @@ Note that *this* sysroot generation doesn't include the gcc shims.
 To do this, with the illumos packages in the normal places under
 $THOME, without needing to be root, run a command like so
 
-./sysroot.sh -u -v 38
+./sysroot.sh -u -v 39
 
 The -u uses zapadd rather than pkgadd so it can run as an unprivileged
 user, and the -v specifies the version. Note that the ownership will
@@ -22,4 +22,4 @@ be incorrect, but that's fine for the intended use case.
 
 This will generate an output file containing the tarred up sysroot:
 
-/var/tmp/sysroot.38.tar.gz
+/var/tmp/sysroot.39.tar.gz
